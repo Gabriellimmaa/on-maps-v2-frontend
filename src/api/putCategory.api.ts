@@ -6,7 +6,7 @@ export const putCategory = async (
   body: TPostCreateCategoryBody
 ): Promise<TCategory> => {
   const { data } = await httpClient.put<TCategory>(
-    `/category/update/${categoryId}`,
+    `/api/category/update/${categoryId}`,
     body
   )
 

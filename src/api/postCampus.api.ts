@@ -4,7 +4,7 @@ import { TCampus, TPostCreateCampusBody } from '@/types'
 export const postCampus = async (
   body: TPostCreateCampusBody
 ): Promise<TCampus> => {
-  const { data } = await httpClient.post<TCampus>(`/campus/create`, {
+  const { data } = await httpClient.post<TCampus>(`/api/campus/create`, {
     body,
   })
 

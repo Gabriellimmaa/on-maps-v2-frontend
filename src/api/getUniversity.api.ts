@@ -2,7 +2,9 @@ import { httpClient } from '@/clients'
 import { TGetUniversityResponse } from '@/types'
 
 export const getUniversity = async (): Promise<TGetUniversityResponse> => {
-  const { data } = await httpClient.get<TGetUniversityResponse>(`/university`)
+  const { data } = await httpClient.get<TGetUniversityResponse>(
+    `/api/university`
+  )
 
   return data
 }
