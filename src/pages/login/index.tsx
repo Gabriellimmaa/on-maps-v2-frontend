@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 import { Form } from '@/components/Form'
 import { useForm } from 'react-hook-form'
-import { loginValidation } from './validation'
+import { loginValidation } from '@/validations/login'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 
 export default function Login() {

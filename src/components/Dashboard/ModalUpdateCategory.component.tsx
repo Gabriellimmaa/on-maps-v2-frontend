@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/useToast.hook'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Form } from '../Form'
-import { createCategoryValidation } from './validations'
+import { createCategoryValidation } from '@/validations/dashboard'
 
 type TProps = {
   open: boolean
@@ -32,7 +32,12 @@ export const ModalUpdateCategory = (props: TProps) => {
     }: {
       categoryId: string
       body: TPostCreateCategoryBody
-    }) => putCategory(categoryId, body)
+    }) => putCategory(categoryId, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['category'])
+      },
+    }
   )
 
   if (!data) return null
@@ -43,7 +48,6 @@ export const ModalUpdateCategory = (props: TProps) => {
         categoryId: data.id.toString(),
         body: dataForm,
       })
-      queryClient.invalidateQueries(['category'])
       formHandler.reset()
       handleClose()
       createToast(`Categoria editada com sucesso!`, 'success')
@@ -51,7 +55,6 @@ export const ModalUpdateCategory = (props: TProps) => {
     } catch (e) {
       createToast(e as string, 'error')
     }
-    handleClose()
   }
 
   return (
@@ -71,7 +74,7 @@ export const ModalUpdateCategory = (props: TProps) => {
         </Typography>
 
         <Form
-          id="create-university"
+          id="update-category"
           handler={formHandler}
           onSubmit={handleSubmit}
         >
@@ -87,7 +90,7 @@ export const ModalUpdateCategory = (props: TProps) => {
           />
 
           <Form.SubmitBtn
-            form="create-university"
+            form="update-category"
             btnProps={{ sx: { width: 1, height: '54px', mt: 2 } }}
             gridProps={{ xs: 12 }}
             handler={formHandler}

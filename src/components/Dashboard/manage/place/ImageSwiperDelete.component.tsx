@@ -10,7 +10,7 @@ type TProps = {
   data: TPlace | undefined
 }
 
-export default function ImageSwiperDelete(props: TProps) {
+export function ImageSwiperDelete(props: TProps) {
   const [data, setData] = useState<TPlace>()
 
   return (

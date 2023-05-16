@@ -15,13 +15,14 @@ import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { deleteUniversity, getCampus, getUniversity } from '@/api'
+import { useQuery } from '@tanstack/react-query'
+import { getCampus, getUniversity } from '@/api'
 import { LoadingSpinner } from '@/components'
-import { queryClient } from '@/clients'
+
 import {
   ModalCreateCampus,
   ModalCreateCategory,
+  ModalCreateEquipment,
   ModalCreateUniversity,
   ModalDelete,
 } from '@/components/Dashboard'
@@ -48,6 +49,8 @@ export default function Dashboard() {
     ['campus'],
     () => getCampus()
   )
+
+  // if (isLoadingUniversities || isLoadingCampuses) return <LoadingSpinner />
 
   return (
     <>
@@ -293,7 +296,9 @@ export default function Dashboard() {
                         <Typography variant="body1">{row.city}</Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body1">Universidade</Typography>
+                        <Typography variant="body1">
+                          {row.university.acronym}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body1">
@@ -319,6 +324,10 @@ export default function Dashboard() {
       <ModalCreateCategory
         open={openCreateCategory}
         handleClose={() => setOpenCreateCategory(false)}
+      />
+      <ModalCreateEquipment
+        open={openCreateEquipment}
+        handleClose={() => setOpenCreateEquipment(false)}
       />
 
       <ModalDelete

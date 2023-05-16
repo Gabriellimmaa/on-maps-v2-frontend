@@ -1,48 +1,51 @@
 import { DialogHeader } from '@/components/Dialog'
 import { Dialog, Typography, DialogContent, Box } from '@mui/material'
-import { TPostCreateUniversityBody, TUniversity } from '@/types'
+import { TCategory, TPostCreateCategoryBody } from '@/types'
 import { useMutation } from '@tanstack/react-query'
-import { postUniversity } from '@/api'
+import { putEquipment } from '@/api'
 import { queryClient } from '@/clients'
 import { useToast } from '@/hooks/useToast.hook'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Form } from '../Form'
-import { createUniversityValidation } from '@/validations/dashboard'
+import { createCategoryValidation } from '@/validations/dashboard'
 
 type TProps = {
   open: boolean
   handleClose: () => void
+  data: TCategory | null
 }
 
-export const ModalCreateUniversity = (props: TProps) => {
-  const { open, handleClose } = props
+export const ModalUpdateEquipment = (props: TProps) => {
+  const { open, handleClose, data } = props
   const { createToast } = useToast()
 
-  const formHandler = useForm<TPostCreateUniversityBody>({
+  const formHandler = useForm<TPostCreateCategoryBody>({
     mode: 'all',
-    resolver: yupResolver(createUniversityValidation()),
-    defaultValues: {
-      name: '',
-      acronym: '',
-      website: '',
-    },
+    resolver: yupResolver(createCategoryValidation()),
   })
 
-  const { mutate: mutateUniversity } = useMutation(
-    (data: TPostCreateUniversityBody) => postUniversity(data),
+  const { mutate: mutateEquipment } = useMutation(
+    ({ id, body }: { id: string; body: TPostCreateCategoryBody }) =>
+      putEquipment(id, body),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['university'])
+        queryClient.invalidateQueries(['equipment'])
       },
     }
   )
 
-  const handleSubmit = async (data: TPostCreateUniversityBody) => {
+  if (!data) return null
+
+  const handleSubmit = async (dataForm: TPostCreateCategoryBody) => {
     try {
-      mutateUniversity(data)
-      createToast(`Universidade criada com sucesso!`, 'success')
+      mutateEquipment({
+        id: data.id.toString(),
+        body: dataForm,
+      })
+      formHandler.reset()
       handleClose()
+      createToast(`Equipamento editada com sucesso!`, 'success')
       return
     } catch (e) {
       createToast(e as string, 'error')
@@ -53,38 +56,41 @@ export const ModalCreateUniversity = (props: TProps) => {
     <Dialog onClose={handleClose} open={open}>
       <DialogHeader onClose={handleClose}>
         <Typography component="span" variant="h6" fontWeight={'bold'}>
-          Criar Universidade
+          Editar Equipamento
         </Typography>
       </DialogHeader>
       <DialogContent dividers>
+        <Typography component="span" variant="body1">
+          Edite os campos abaixo para editar o equipamento.
+        </Typography>
+        <Box />
+        <Typography component="span" variant="body2">
+          <b>Nome do equipamento:</b> {data.name}
+        </Typography>
+
         <Form
-          id="create-university"
+          id="update-equipment"
           handler={formHandler}
           onSubmit={handleSubmit}
         >
           <Form.TextInput
             id="name"
-            label="Nome da instituição"
+            label="Novo nome"
             gridProps={styles.name}
+            textFieldProps={{
+              sx: {
+                mt: 4,
+              },
+            }}
           />
-          <Form.TextInput
-            id="acronym"
-            label="Sigla"
-            gridProps={styles.acronym}
-            type="uppercase"
-          />
-          <Form.TextInput
-            id="website"
-            label="Website"
-            gridProps={styles.website}
-          />
+
           <Form.SubmitBtn
-            form="create-university"
+            form="update-equipment"
             btnProps={{ sx: { width: 1, height: '54px', mt: 2 } }}
             gridProps={{ xs: 12 }}
             handler={formHandler}
           >
-            Criar Universidade
+            Editar
           </Form.SubmitBtn>
         </Form>
       </DialogContent>
@@ -94,12 +100,6 @@ export const ModalCreateUniversity = (props: TProps) => {
 
 const styles = {
   name: {
-    xs: 12,
-  },
-  acronym: {
-    xs: 12,
-  },
-  website: {
     xs: 12,
   },
 }

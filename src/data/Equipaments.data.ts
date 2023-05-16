@@ -1,4 +1,4 @@
-import { TEquipaments } from '@/types/TEquipaments.type'
+import { TEquipaments } from '@/types/TEquipment.type'
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import AcUnitIcon from '@mui/icons-material/AcUnit'
 import FreeBreakfastIcon from '@mui/icons-material/FreeBreakfast'

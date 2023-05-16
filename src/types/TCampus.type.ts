@@ -1,4 +1,5 @@
 import { TPlace } from './TPlace.type'
+import { TUniversity } from './TUniversity.type'
 
 export type TCampus = {
   id: number
@@ -7,6 +8,7 @@ export type TCampus = {
   state: string
   phone: string
   email: string
+  university: TUniversity
   universityId: number
   place: TPlace[]
   createdAt: string

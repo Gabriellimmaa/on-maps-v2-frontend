@@ -4,7 +4,7 @@ import { MapCardSearch } from './_MapCardSearch.component'
 import { AiOutlineMenu } from 'react-icons/ai'
 import { BsFillGridFill } from 'react-icons/bs'
 import { TbListDetails } from 'react-icons/tb'
-import { useMapInfo } from '@/pages/map/context/_useMapInfo.context'
+import { useMapInfo } from '@/context/_useMapInfo.context'
 
 const rooms = [
   {

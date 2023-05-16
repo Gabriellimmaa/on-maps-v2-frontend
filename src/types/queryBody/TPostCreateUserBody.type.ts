@@ -1,8 +1,9 @@
 import { TRole } from '@/types'
 
-export type TPutUser = {
+export type TPostCreateUserBody = {
   firstName: string
   lastName: string
-  password?: string
+  email: string
+  password: string
   role: TRole[]
 }

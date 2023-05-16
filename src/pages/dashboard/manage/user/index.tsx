@@ -14,9 +14,9 @@ import {
 
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { TUser } from './types'
+import { TUser } from '@/types'
 import { DataRole } from '@/data'
-import { ModalDelete, ModalEdit } from './components'
+import { ModalDelete, ModalEdit } from '@/components/Dashboard/manage/user'
 import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useDebounce } from '@/hooks'

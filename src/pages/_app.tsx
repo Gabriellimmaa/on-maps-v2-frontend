@@ -1,7 +1,7 @@
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 import NoSSR from 'react-no-ssr'
-import { MapInfoProvider } from './map/context/_useMapInfo.context'
+import { MapInfoProvider } from '@/context/_useMapInfo.context'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/clients'
 import { CssBaseline, ThemeProvider } from '@mui/material'

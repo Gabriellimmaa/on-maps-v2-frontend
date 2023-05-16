@@ -13,20 +13,15 @@ import {
   Paper,
   Tooltip,
 } from '@mui/material'
-import {
-  TCategory,
-  TPostCreateCategoryBody,
-  TPostCreateUniversityBody,
-  TUniversity,
-} from '@/types'
+import { TCategory, TPostCreateCategoryBody } from '@/types'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { getCategory, postCategory, postUniversity } from '@/api'
+import { getCategory, postCategory } from '@/api'
 import { queryClient } from '@/clients'
 import { useToast } from '@/hooks/useToast.hook'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Form } from '../Form'
-import { createCategoryValidation } from './validations'
+import { createCategoryValidation } from '@/validations/dashboard'
 import { LoadingSpinner } from '../Loading'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -57,20 +52,22 @@ export const ModalCreateCategory = (props: TProps) => {
   )
 
   const { mutate: mutateUniversity } = useMutation(
-    (data: TPostCreateCategoryBody) => postCategory(data)
+    (data: TPostCreateCategoryBody) => postCategory(data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries(['category'])
+      },
+    }
   )
 
   const handleSubmit = async (data: TPostCreateCategoryBody) => {
     try {
       mutateUniversity(data)
-      queryClient.invalidateQueries(['university'])
       formHandler.reset()
       createToast(`Categoria criada com sucesso!`, 'success')
-      return
     } catch (e) {
       createToast(e as string, 'error')
     }
-    handleClose()
   }
 
   if (isLoadingCategories) <LoadingSpinner />

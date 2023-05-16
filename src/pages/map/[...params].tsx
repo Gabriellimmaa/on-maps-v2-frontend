@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import React, { useEffect } from 'react'
 import { MapHeader, MapSearch, MapSideBar } from '@/components'
-import { useMapInfo } from './context/_useMapInfo.context'
+import { useMapInfo } from '@/context/_useMapInfo.context'
 import 'leaflet/dist/leaflet.css'
 
 const MapComponent = dynamic(() => import('@/components/Map/Map.component'), {

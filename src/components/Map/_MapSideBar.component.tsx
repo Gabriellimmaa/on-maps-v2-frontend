@@ -7,7 +7,7 @@ import { DataMapCategories, DataCampus, DataEvents } from '@/data'
 import Image from 'next/image'
 import ImageHeader from '@/assets/header.png'
 import { IoClose } from 'react-icons/io5'
-import { useMapInfo } from '@/pages/map/context/_useMapInfo.context'
+import { useMapInfo } from '@/context/_useMapInfo.context'
 
 export function MapSideBar() {
   const { position, setPosition, config, setConfig, viewMenu, setViewMenu } =

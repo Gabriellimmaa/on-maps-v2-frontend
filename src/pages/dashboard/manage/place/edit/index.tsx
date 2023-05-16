@@ -10,9 +10,12 @@ import { TPlace } from '@/types'
 import 'swiper/css'
 import 'swiper/swiper-bundle.css'
 import React from 'react'
-import { ModalDelete } from '../components'
-import { createPlace } from '../components/validations'
-import ImageSwiperDelete from '../components/ImageSwiperDelete.component'
+import {
+  ModalDelete,
+  ImageSwiperDelete,
+} from '@/components/Dashboard/manage/place'
+
+import { createPlaceValidation } from '@/validations/dashboard/manage/place'
 
 const MapComponent = dynamic(() => import('@/components/Map/Map.component'), {
   loading: () => <p>loading...</p>,
@@ -44,7 +47,7 @@ export default function EditPlace(props: TProps) {
     position: any
   }>({
     mode: 'all',
-    resolver: yupResolver(createPlace()),
+    resolver: yupResolver(createPlaceValidation()),
     // defaultValues: {
     //   name: props.data?.name,
     //   category: props.data?.category,

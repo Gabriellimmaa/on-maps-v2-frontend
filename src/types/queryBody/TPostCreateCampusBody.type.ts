@@ -3,5 +3,5 @@ import { TCampus } from '../TCampus.type'
 
 export type TPostCreateCampusBody = Omit<
   TCampus,
-  'id' | 'createdAt' | 'updatedAt' | 'place'
+  'id' | 'createdAt' | 'updatedAt' | 'place' | 'university'
 >

@@ -10,6 +10,7 @@ import {
   ListItemText,
   InputLabel,
   useTheme,
+  Link,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -29,6 +30,7 @@ import { getCampus, postPlace } from '@/api'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { queryClient } from '@/clients'
 import { LoadingSpinner } from '@/components'
+import { flexCenterContent } from '@/utils/cssInJsBlocks'
 
 const MapComponent = dynamic(() => import('@/components/Map/Map.component'), {
   loading: () => <p>loading...</p>,
@@ -156,7 +158,17 @@ export default function Place() {
 
   if (!responseCampus)
     return (
-      <p>Impossivel criar ambienete pois nao existe um campus registrado</p>
+      <Box sx={{ ...flexCenterContent, flexDirection: 'column' }}>
+        <Typography variant="h4" textAlign="center">
+          Não é possível criar um ambiente sem mesmo ao ter um campus
+        </Typography>
+        <Typography variant="h4" textAlign="center" mb={4}>
+          Vá em nossa dashboard e crie um campus
+        </Typography>
+        <Button component={Link} href="/dashboard">
+          Criar campus
+        </Button>
+      </Box>
     )
 
   return (

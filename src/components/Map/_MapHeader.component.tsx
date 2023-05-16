@@ -9,7 +9,7 @@ import {
 } from 'react'
 import styles from './styles/MapHeader.module.css'
 import { MdKeyboardArrowRight, MdKeyboardArrowLeft } from 'react-icons/md'
-import { useMapInfo } from '@/pages/map/context/_useMapInfo.context'
+import { useMapInfo } from '@/context/_useMapInfo.context'
 
 export function MapHeader() {
   const { config, setConfig, viewMenu, setViewMenu } = useMapInfo()

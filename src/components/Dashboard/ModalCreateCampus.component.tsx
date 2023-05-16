@@ -1,16 +1,17 @@
 import { DialogHeader } from '@/components/Dialog'
-import { Dialog, Typography, DialogContent, Box } from '@mui/material'
-import { TPostCreateCampusBody, TUniversity } from '@/types'
+import { Dialog, Typography, DialogContent } from '@mui/material'
+import { TPostCreateCampusBody } from '@/types'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { getUniversity, postCampus, postUniversity } from '@/api'
+import { getUniversity, postCampus } from '@/api'
 import { queryClient } from '@/clients'
 import { useToast } from '@/hooks/useToast.hook'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Form } from '../Form'
-import { createCampusValidation } from './validations'
+import { createCampusValidation } from '@/validations/dashboard'
 import { cellPhoneInputMask } from '@/utils/inputMasks'
 import { useEffect } from 'react'
+import { onlyNumbers } from '@/utils/helpers'
 
 type TProps = {
   open: boolean
@@ -42,17 +43,19 @@ export const ModalCreateCampus = (props: TProps) => {
     (data: TPostCreateCampusBody) => postCampus(data),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['university'])
+        queryClient.invalidateQueries(['campus'])
       },
     }
   )
 
   const handleSubmit = async (data: TPostCreateCampusBody) => {
-    console.log(data)
     try {
-      mutateCampus(data)
+      const dataToSubmit = {
+        ...data,
+        phone: onlyNumbers(data.phone),
+      }
+      mutateCampus(dataToSubmit)
       createToast(`Universidade criada com sucesso!`, 'success')
-      return
     } catch (e) {
       createToast(e as string, 'error')
     }

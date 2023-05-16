@@ -1,5 +1,5 @@
 import { TCampus } from './TCampus.type'
-import { TEquipaments } from './TEquipaments.type'
+import { TEquipaments } from './TEquipment.type'
 import { TMapCategories } from './TMapCategories.type'
 
 export type TPlace = {

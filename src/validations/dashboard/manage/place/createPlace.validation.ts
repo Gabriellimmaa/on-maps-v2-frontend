@@ -2,7 +2,7 @@ import { TPlace, TPostCreatePlaceBody } from '@/types'
 import { Yup } from '@/utils/formValidator'
 import { formatCurrencyToString, onlyNumbers } from '@/utils/helpers'
 
-export const createPlace = (): Yup.ObjectSchema<any> => {
+export const createPlaceValidation = (): Yup.ObjectSchema<any> => {
   return Yup.object().shape({
     name: Yup.string().required('Campo obrigatório'),
     description: Yup.string().required('Campo obrigatório'),

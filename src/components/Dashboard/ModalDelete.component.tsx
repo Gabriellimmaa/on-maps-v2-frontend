@@ -81,28 +81,31 @@ export const ModalDelete = (props: TProps) => {
     try {
       if (type === 'campus') {
         mutateCampus(data.id.toString())
+        handleClose()
         createToast(`Campus deletado com sucesso!`, 'success')
         return
       }
       if (type === 'university') {
         mutateUniversity(data.id.toString())
+        handleClose()
         createToast(`Universidade deletada com sucesso!`, 'success')
         return
       }
       if (type === 'category') {
         mutateCategory(data.id.toString())
+        handleClose()
         createToast(`Categoria deletada com sucesso!`, 'success')
         return
       }
       if (type === 'equipment') {
         mutateEquipment(data.id.toString())
+        handleClose()
         createToast(`Equipamento deletado com sucesso!`, 'success')
         return
       }
     } catch (e) {
       createToast(e as string, 'error')
     }
-    handleClose()
   }
 
   return (

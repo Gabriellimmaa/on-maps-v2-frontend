@@ -17,8 +17,12 @@ import {
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ImageIcon from '@mui/icons-material/Image'
-import { ModalDelete, ModalEdit } from './components'
-import { ModalImage } from './components/ModalImage.component'
+import {
+  ModalDelete,
+  ModalEdit,
+  ModalImage,
+} from '@/components/Dashboard/manage/place'
+
 import { useQuery } from '@tanstack/react-query'
 
 import { TCampus, TPlace, TGetPlaceFilterQueryParams } from '@/types'
