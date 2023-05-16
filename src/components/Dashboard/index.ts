@@ -1,0 +1,5 @@
+export { ModalCreateCampus } from './ModalCreateCampus.component'
+export { ModalDelete } from './ModalDelete.component'
+export { ModalCreateUniversity } from './ModalCreateUniversity.component'
+export { ModalCreateCategory } from './ModalCreateCategory.component'
+export { ModalUpdateCategory } from './ModalUpdateCategory.component'

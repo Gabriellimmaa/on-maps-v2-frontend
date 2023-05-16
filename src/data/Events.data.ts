@@ -1,0 +1,32 @@
+export const DataEvents = [
+  {
+    id: 1,
+    title: "Recepção calouros",
+    description: "Descrição do evento 1",
+    date: "2020-10-10",
+    campus: "bandeirantes",
+    category: "evento",
+    lat: -23.108,
+    lng: -50.3594239,
+  },
+  {
+    id: 2,
+    title: "Evento 2",
+    description: "Descrição do evento 2",
+    date: "2020-10-10",
+    campus: "bandeirantes",
+    category: "evento",
+    lat: -23.108,
+    lng: -50.3594239,
+  },
+  {
+    id: 3,
+    title: "Evento 3",
+    description: "Descrição do evento 3",
+    date: "2020-10-10",
+    campus: "bandeirantes",
+    category: "evento",
+    lat: -23.108,
+    lng: -50.3594239,
+  },
+];

@@ -1,0 +1,177 @@
+:root {
+  --primary-main: #183883;
+  --primary-light: #2f4c8f;
+  --primary-dark: #0f1f4f;
+  --secondary-main: #f2f2f5;
+  --secondary-light: #fff;
+  --secondary-dark: #c9c9c9;
+  --tertiary-main: #57636f;
+  --tertiary-light: #78828b;
+  --tertiary-dark: #3c454d;
+  --tertiary-contrastText: #f2f2f5;
+  --background-default: #f2f2f5;
+  --background-paper: #fff;
+
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+p {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: #f2f2f5;
+  padding: 0 !important;
+}
+
+.css-j76isy-MuiPaper-root-MuiAppBar-root {
+  /* padding: 0 !important; */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* button[type='submit'] {
+  background-color: #2563eb;
+  border-radius: 8px;
+  width: 120px;
+  padding: 12px 0;
+  border-style: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+button[type='submit']:hover {
+  transition: 0.2s;
+  background-color: #1d4ed8;
+}
+
+input[type='text'],
+input[type='password'] {
+  border-radius: 8px;
+  height: 32px;
+  background-clip: padding-box;
+  border-style: solid;
+  border-color: rgb(231, 231, 231);
+  text-decoration-color: rgb(55 65 81);
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    backdrop-filter;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  color: #374151;
+  background-color: #f2f2f5;
+  outline: none;
+  padding: 4px 8px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.75rem;
+}
+
+input[type='text']:hover,
+input[type='password']:hover {
+  color: #374151;
+  background-color: #fff;
+  outline: none;
+}
+
+input[type='text']:focus,
+input[type='password']:focus {
+  border-color: #2563eb;
+  color: #374151;
+  background-color: #fff;
+  outline: none;
+}
+
+input[type='checkbox'] {
+  cursor: pointer;
+} */
+
+.leaflet-popup-content {
+  margin: 15px !important;
+}
+
+.onmaps-loading-blue {
+  position: relative;
+  overflow: hidden;
+}
+
+.onmaps-loading-blue img {
+  margin-bottom: 10px;
+  width: auto;
+}
+
+.onmaps-loading-blue::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 5px;
+  background-color: var(--primary-main);
+  transform: translateX(-100%);
+  animation: moveBar 3s infinite;
+}
+
+
+.onmaps-loading-white {
+  position: relative;
+  overflow: hidden;
+}
+
+.onmaps-loading-white img {
+  width: auto;
+}
+
+.onmaps-loading-white::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: rgb(187, 187, 187);
+  transform: translateX(-100%);
+  animation: moveBar 3s infinite;
+}
+
+
+@keyframes moveBar {
+  0% {
+    transform: translateX(-100%);
+    width: 0;
+    /* Define a largura inicial do pseudo-elemento para 0 */
+
+  }
+
+  100% {
+    transform: translateX(100%);
+    width: calc(100% + 10px);
+    /* Define a largura final do pseudo-elemento para a largura da imagem + 10px */
+
+  }
+}
