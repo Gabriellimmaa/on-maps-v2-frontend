@@ -23,12 +23,12 @@ export function ImageSwiperDelete(props: TProps) {
           flexDirection: 'column',
         }}
       >
-        <Image
+        {/* <Image
           src={require('../../../../../assets/UserIcon.png')}
           alt={'Image'}
           width={250}
           height={150}
-        />
+        /> */}
         <Button
           onClick={() => {
             setData(props.data)
@@ -48,12 +48,12 @@ export function ImageSwiperDelete(props: TProps) {
           flexDirection: 'column',
         }}
       >
-        <Image
+        {/* <Image
           src={require('../../../../../assets/UenpLogo.png')}
           alt={'Image'}
           width={250}
           height={150}
-        />
+        /> */}
         <Button
           onClick={() => {
             setData(props.data)
@@ -72,12 +72,12 @@ export function ImageSwiperDelete(props: TProps) {
           flexDirection: 'column',
         }}
       >
-        <Image
+        {/* <Image
           src={require('../../../../../assets/UenpLogo.png')}
           alt={'Image'}
           width={250}
           height={150}
-        />
+        /> */}
         <Button
           onClick={() => {
             setData(props.data)

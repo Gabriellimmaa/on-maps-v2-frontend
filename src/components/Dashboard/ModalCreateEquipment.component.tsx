@@ -50,23 +50,24 @@ export const ModalCreateEquipment = (props: TProps) => {
     getEquipment()
   )
 
-  const { mutate: mutateUniversity } = useMutation(
+  const { mutateAsync: mutateUniversity } = useMutation(
     (data: TPostCreateEquipmentBody) => postEquipment(data),
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries(['equipment'])
+        formHandler.reset()
+        createToast(`Equipamento criada com sucesso!`, 'success')
+      },
+      onError: (error: any) => {
+        createToast(error.response.data.message, 'error')
       },
     }
   )
 
   const handleSubmit = async (data: TPostCreateEquipmentBody) => {
     try {
-      mutateUniversity(data)
-      formHandler.reset()
-      createToast(`Equipamento criada com sucesso!`, 'success')
-    } catch (e) {
-      createToast(e as string, 'error')
-    }
+      await mutateUniversity(data)
+    } catch {}
   }
 
   if (isLoading) <LoadingSpinner />

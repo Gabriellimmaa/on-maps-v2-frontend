@@ -15,14 +15,54 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt'
 import EditLocationIcon from '@mui/icons-material/EditLocation'
 import HomeIcon from '@mui/icons-material/Home'
-
+import TravelExploreIcon from '@mui/icons-material/TravelExplore'
+import MapIcon from '@mui/icons-material/Map'
+import InfoIcon from '@mui/icons-material/Info'
+import EventIcon from '@mui/icons-material/Event'
+import { grey } from '@mui/material/colors'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 const drawerWidth = 64
 const data = [
   {
-    title: 'Dashboard',
+    title: 'Início',
     icon: <HomeIcon />,
+    path: '/',
+    route: true,
+    style: {
+      borderBottom: `1px solid ${grey[300]}`,
+    },
+  },
+  {
+    title: 'Mapa',
+    icon: <MapIcon />,
+    route: false,
+    style: {
+      borderBottom: `1px solid ${grey[300]}`,
+    },
+  },
+  {
+    title: 'Buscar lugares',
+    icon: <TravelExploreIcon />,
+    path: '/place/list',
+    route: true,
+    style: {
+      borderBottom: `1px solid ${grey[300]}`,
+    },
+  },
+  {
+    title: 'Eventos',
+    icon: <EventIcon />,
+    path: '/event/list',
+    route: true,
+    style: {
+      borderBottom: `1px solid ${grey[300]}`,
+    },
+  },
+  {
+    title: 'Dashboard',
+    icon: <AdminPanelSettingsIcon />,
     path: 'dashboard',
   },
   {

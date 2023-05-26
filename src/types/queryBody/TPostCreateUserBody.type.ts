@@ -1,9 +1,8 @@
-import { TRole } from '@/types'
+import { TPermissions } from '@/types'
 
 export type TPostCreateUserBody = {
-  firstName: string
-  lastName: string
+  username: string
   email: string
   password: string
-  role: TRole[]
+  permissions: TPermissions[]
 }

@@ -1,7 +1,7 @@
 import { DialogHeader } from '@/components/Dialog'
 import { Form } from '@/components/Form'
 import { DataRole } from '@/data'
-import { Dialog, Typography, DialogContent } from '@mui/material'
+import { Dialog, Typography, DialogContent, Divider } from '@mui/material'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TPlace } from '@/types'
@@ -24,7 +24,17 @@ export const ModalImage = (props: TProps) => {
   if (!data) return null
 
   return (
-    <Dialog onClose={handleClose} aria-labelledby="config-dialog" open={open}>
+    <Dialog
+      onClose={handleClose}
+      aria-labelledby="config-dialog"
+      open={open}
+      sx={{
+        '& .MuiDialog-paper': {
+          width: '100%',
+          height: '100%',
+        },
+      }}
+    >
       <DialogHeader id="config-dialog-title" onClose={handleClose}>
         <Typography component="span" variant="h6" fontWeight={'bold'}>
           Visualizar Imagens
@@ -33,13 +43,10 @@ export const ModalImage = (props: TProps) => {
       <DialogContent
         dividers
         sx={{
-          textAlign: 'center',
+          pt: 0,
         }}
       >
-        <Typography component="span" variant="body1" fontWeight={'bold'}>
-          Clique e arrate para o lado
-        </Typography>
-        <ImageSwiper />
+        <ImageSwiper images={data.image} />
       </DialogContent>
     </Dialog>
   )

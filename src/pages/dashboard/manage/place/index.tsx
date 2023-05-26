@@ -12,6 +12,7 @@ import {
   Box,
   Grid,
   InputAdornment,
+  Link,
 } from '@mui/material'
 
 import EditIcon from '@mui/icons-material/Edit'
@@ -32,8 +33,9 @@ import { Form } from '@/components/Form'
 import SearchIcon from '@mui/icons-material/Search'
 import { useDebounce } from '@/hooks'
 import { getCampus, getPlaceFilter } from '@/api'
+import LaunchIcon from '@mui/icons-material/Launch'
 
-const header = ['Ações', 'Nome', 'Campus', 'Bloco', 'Piso', 'Imagem']
+const header = ['Ações', 'Nome', 'Campus', 'Bloco', 'Piso', '']
 
 type formProps = {
   campusId: number
@@ -118,151 +120,138 @@ export default function ManagePlace() {
 
   if (!campus)
     return (
-      <Typography variant="h4">
-        Você não consegue acessar essa página pois não há campus cadastrados no
-        sistema.
+      <Typography variant="h4" textAlign="center">
+        Existe pendentências para serem resolvidas, vá para o inicio da
+        dashboard e valide os dados.
       </Typography>
     )
 
   return (
     <>
-      {places === undefined ? (
-        <Typography variant="h4" textAlign="center">
-          Não há lugares cadastrados no sistema.
-        </Typography>
-      ) : (
-        <>
-          <Form
-            id="filter-places"
-            handler={formHandler}
-            onSubmit={async (data: any) => {
-              console.log(data)
-            }}
-          >
-            <Grid xs={6}>
-              <Typography variant="h4" sx={{ mb: 2 }}>
-                Gerenciar Ambientes
-              </Typography>
-            </Grid>
-            <Form.TextInput
-              id="name"
-              label="Nome"
-              gridProps={{
-                xs: 3,
-              }}
-            />
+      <Form
+        id="filter-places"
+        handler={formHandler}
+        onSubmit={async (data: any) => {
+          console.log(data)
+        }}
+      >
+        <Grid xs={6}>
+          <Typography variant="h4" sx={{ mb: 2 }}>
+            Gerenciar Ambientes
+          </Typography>
+        </Grid>
+        <Form.TextInput
+          id="name"
+          label="Nome"
+          gridProps={{
+            xs: 3,
+          }}
+        />
 
-            <Form.SelectInput
-              id="campusId"
-              label="Campus"
-              gridProps={{
-                xs: 3,
-              }}
-              values={campus.map((campus: any) => ({
-                value: campus.id,
-                label: campus.name,
-              }))}
-            />
-          </Form>
-          <TableContainer component={Paper}>
-            <TableHead>
-              <TableRow>
-                {header.map((item, index) => (
-                  <TableCell key={index}>{item}</TableCell>
-                ))}
+        <Form.SelectInput
+          id="campusId"
+          label="Campus"
+          gridProps={{
+            xs: 3,
+          }}
+          values={campus.map((campus: any) => ({
+            value: campus.id,
+            label: campus.name,
+          }))}
+        />
+      </Form>
+      <TableContainer component={Paper}>
+        <TableHead>
+          <TableRow>
+            {header.map((item, index) => (
+              <TableCell key={index}>{item}</TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody
+          sx={{
+            position: 'relative',
+          }}
+        >
+          {isLoadingPlaces && (
+            <Box sx={styles.overlay}>
+              <LoadingSpinner
+                boxProps={{
+                  position: 'absolute',
+                  margin: 'auto',
+                }}
+              />
+            </Box>
+          )}
+          {places?.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={12}>
+                <Typography variant="h5" my={5} textAlign={'center'}>
+                  Nenhum ambiente encontrado.
+                </Typography>
+              </TableCell>
+            </TableRow>
+          ) : (
+            places?.map((place) => (
+              <TableRow key={place.id} sx={styles.tableRow}>
+                <TableCell>
+                  <Tooltip title="Editar">
+                    <EditIcon
+                      onClick={() => {
+                        setData(place)
+                        setOpenEdit(true)
+                      }}
+                      sx={{ cursor: 'pointer', mr: 1 }}
+                      color="primary"
+                    />
+                  </Tooltip>
+                  <Tooltip title="Deletar">
+                    <DeleteIcon
+                      onClick={() => {
+                        setData(place)
+                        setOpenDelete(true)
+                      }}
+                      sx={{ cursor: 'pointer', mr: 1 }}
+                      color="error"
+                    />
+                  </Tooltip>
+                  <Tooltip title="Ver Imagem">
+                    <ImageIcon
+                      onClick={() => {
+                        setData(place)
+                        setOpenImage(true)
+                      }}
+                      sx={{ cursor: 'pointer', mr: 1 }}
+                      color="primary"
+                    />
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1">{place.name}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1">{place.campus.name}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1">{place.building}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1">{place.floor}</Typography>
+                </TableCell>
+
+                <TableCell>
+                  <Tooltip title="Ver Evento" placement="left">
+                    <Link href={`/place/${place.id}`}>
+                      <LaunchIcon sx={{ cursor: 'pointer' }} />
+                    </Link>
+                  </Tooltip>
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody
-              sx={{
-                position: 'relative',
-              }}
-            >
-              {isLoadingPlaces && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    position: 'absolute',
-                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                    width: '100%',
-                    height: '100%',
-                  }}
-                >
-                  <LoadingSpinner
-                    boxProps={{
-                      position: 'absolute',
-                      margin: 'auto',
-                    }}
-                  />
-                </Box>
-              )}
-              {places.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={12}>
-                    <Typography variant="h5" my={5} textAlign={'center'}>
-                      Nenhum lugar encontrado.
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                places.map((place) => (
-                  <TableRow key={place.id} sx={styles.tableRow}>
-                    <TableCell>
-                      <Tooltip title="Editar">
-                        <EditIcon
-                          onClick={() => {
-                            setData(place)
-                            setOpenEdit(true)
-                          }}
-                          sx={{ cursor: 'pointer', mr: 1 }}
-                          color="primary"
-                        />
-                      </Tooltip>
-                      <Tooltip title="Deletar">
-                        <DeleteIcon
-                          onClick={() => {
-                            setData(place)
-                            setOpenDelete(true)
-                          }}
-                          sx={{ cursor: 'pointer', ml: 1 }}
-                          color="error"
-                        />
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body1">{place.name}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body1">
-                        {place.campus.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body1">{place.building}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body1">{place.floor}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title="Ver Imagem">
-                        <ImageIcon
-                          onClick={() => {
-                            setData(place)
-                            setOpenImage(true)
-                          }}
-                          sx={{ cursor: 'pointer', mr: 1 }}
-                          color="primary"
-                        />
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </TableContainer>
-        </>
-      )}
+            ))
+          )}
+        </TableBody>
+      </TableContainer>
+
       <ModalDelete
         open={openDelete}
         handleClose={() => setOpenDelete(false)}
@@ -287,5 +276,14 @@ export default function ManagePlace() {
 const styles = {
   tableRow: {
     '&:last-child td, &:last-child th': { border: 0 },
+  },
+  overlay: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    width: '100%',
+    height: '100%',
   },
 }

@@ -29,24 +29,24 @@ export const ModalCreateUniversity = (props: TProps) => {
     },
   })
 
-  const { mutate: mutateUniversity } = useMutation(
+  const { mutateAsync: mutateUniversity } = useMutation(
     (data: TPostCreateUniversityBody) => postUniversity(data),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(['university'])
+        createToast(`Universidade criada com sucesso!`, 'success')
+        handleClose()
+      },
+      onError: (error: any) => {
+        createToast(error.response.data.message, 'error')
       },
     }
   )
 
   const handleSubmit = async (data: TPostCreateUniversityBody) => {
     try {
-      mutateUniversity(data)
-      createToast(`Universidade criada com sucesso!`, 'success')
-      handleClose()
-      return
-    } catch (e) {
-      createToast(e as string, 'error')
-    }
+      await mutateUniversity(data)
+    } catch {}
   }
 
   return (

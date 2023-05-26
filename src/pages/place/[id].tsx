@@ -1,20 +1,8 @@
-import {
-  Divider,
-  Box,
-  CardMedia,
-  Grid,
-  Typography,
-  Button,
-} from '@mui/material'
+import { Divider, Box, Grid, Typography, Button } from '@mui/material'
 import Image from 'next/image'
-import { Category } from '@/components'
-import { TPlace } from '@/types'
-import { Router } from 'next/router'
 import { useRouter } from 'next/router'
-import { createElement, useEffect } from 'react'
+import { createElement } from 'react'
 import { DataEquipaments, DataMapCategories } from '@/data'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Autoplay, Navigation, Pagination } from 'swiper'
 import Carousel from 'react-material-ui-carousel'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore'
@@ -99,9 +87,22 @@ export default function PlaceList() {
         <Grid container>
           <Grid xs={8} sx={styles.informationDetail}>
             <Box sx={styles.containerGap}>
-              <Typography variant="h5">Campus: {place.campus.name}</Typography>
-              <Typography variant="h5">Bloco: {place.building}</Typography>
-              <Typography variant="h5">Piso: {place.floor} </Typography>
+              <Typography variant="h4">Bloco: {place.building}</Typography>
+              <Typography variant="h4">Piso: {place.floor} </Typography>
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={{ m: 0 }}>
+                Universidade
+              </Typography>
+              <Typography variant="body2">
+                {place.campus.university.name}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={{ m: 0 }}>
+                Campus
+              </Typography>
+              <Typography variant="body2">{place.campus.name}</Typography>
             </Box>
             <Box>
               <Typography variant="h4" sx={{ m: 0 }}>
@@ -109,40 +110,47 @@ export default function PlaceList() {
               </Typography>
               <Typography variant="body2">{place.description}</Typography>
             </Box>
-
             <Box>
               <Typography variant="h4" sx={{ m: 0 }}>
                 Horário de funcionamento
               </Typography>
-              <Typography variant="body2">
-                Dás 8h às 18h, de segunda à sexta
-              </Typography>
+              {place.open24h ? (
+                <Typography variant="body2">
+                  Aberto 24h: {place.open24h ? 'Sim' : 'Não'}
+                </Typography>
+              ) : (
+                <Typography variant="body2">
+                  Dás{' '}
+                  {place.date
+                    ? new Date(place.date.start).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : ''}{' '}
+                  às{' '}
+                  {place.date
+                    ? new Date(place.date?.end).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : ''}{' '}
+                </Typography>
+              )}
             </Box>
-
             {place.equipment.length !== 0 && (
               <Box>
                 <Typography variant="h4">Equipamentos</Typography>
                 <Box sx={styles.tagContainer}>
-                  {DataEquipaments.filter((item) =>
-                    place.equipment.includes(item.value)
-                  ).map((item, _index) => {
+                  {place.equipment.map((item, index) => {
                     return (
-                      <>
-                        <Box key={item.value} sx={styles.tag}>
-                          {createElement(item.icon, {
-                            sx: {
-                              fontSize: 18,
-                            },
-                          })}
-                          {item.title}
-                        </Box>
-                      </>
+                      <Box key={index} sx={styles.tag}>
+                        {item}
+                      </Box>
                     )
                   })}
                 </Box>
               </Box>
             )}
-
             {place.responsible && (
               <Box>
                 <Typography variant="h4">Responsável pelo local</Typography>
@@ -172,10 +180,39 @@ export default function PlaceList() {
                   Telefone: {place.responsible.phone}
                 </Typography>
               </Box>
-            )}
-
+            )}{' '}
+          </Grid>
+          <Grid xs={4}>
+            <Carousel
+              NextIcon={<NavigateNextIcon />}
+              PrevIcon={<NavigateBeforeIcon />}
+              navButtonsAlwaysVisible
+              autoPlay={false}
+              fullHeightHover={false}
+              animation="slide"
+              duration={800}
+              sx={styles.imageContainer}
+            >
+              {place?.image.map((item, index) => {
+                return (
+                  <Image
+                    height={350}
+                    key={index}
+                    src={item.url}
+                    alt={item.name}
+                    width={400}
+                    style={{
+                      width: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                )
+              })}
+            </Carousel>
             <Box>
-              <Typography variant="h4">Mais informações</Typography>
+              <Typography variant="h4" mt={2}>
+                Mais informações
+              </Typography>
               <Box
                 sx={{
                   display: 'flex',
@@ -195,38 +232,8 @@ export default function PlaceList() {
                     Capacidade: {place.capacity}
                   </Typography>
                 )}
-                {place.open24h && (
-                  <Typography variant="body2">
-                    Aberto 24h: {place.open24h ? 'Sim' : 'Não'}
-                  </Typography>
-                )}
               </Box>
             </Box>
-          </Grid>
-          <Grid xs={4}>
-            <Carousel
-              NextIcon={<NavigateNextIcon />}
-              PrevIcon={<NavigateBeforeIcon />}
-              navButtonsAlwaysVisible
-              sx={styles.imageContainer}
-            >
-              {/* @todo - renderizar imagens do place */}
-              {/* {place?.image.map((item, index) => {
-                return (
-                  <Image
-                    height={350}
-                    key={index}
-                    src={item.url}
-                    alt={item.name}
-                    width={400}
-                    style={{
-                      width: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                )
-              })} */}
-            </Carousel>
             <Box>
               {/* <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235203.81500692177!2d-43.58841988251077!3d-22.9111720903467!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9bde559108a05b%3A0x50dc426c672fd24e!2sRio+de+Janeiro%2C+RJ!5e0!3m2!1spt-BR!2sbr!4v1476880758681"
@@ -237,41 +244,30 @@ export default function PlaceList() {
               /> */}
             </Box>
           </Grid>
-          <Grid xs={12}>
-            <Typography variant="h4">Localização</Typography>
-            <MapComponent
-              center={[place.position[0].latitude, place.position[0].longitude]}
-              mapStyle={{
-                minHeight: '350px',
+          <Grid xs={12} sx={{ mt: 2 }}>
+            <Typography variant="h4" mb={1}>
+              Localização
+            </Typography>
+
+            <iframe
+              src={`https://maps.google.com/maps?q=${place.position[0].latitude}, ${place.position[0].longitude}&z=15&output=embed`}
+              frameBorder="0"
+              width={'100%'}
+              height={250}
+              allowFullScreen
+            />
+
+            <Button
+              sx={{
+                width: 1,
+                py: 3,
               }}
+              component={Link}
+              href={`https://www.google.com/maps/dir/?api=1&destination=${place.position[0].latitude},${place.position[0].longitude}`}
+              target="_blank"
             >
-              <MarkerComponent
-                latitude={place.position[0].latitude}
-                longitude={place.position[0].longitude}
-                place={place}
-                category={place.category}
-                zoomIcon={zoomIcon}
-                anchorIcon={anchorIcon}
-                popAnchor={popAnchor}
-              />
-              <Link
-                target="_blank"
-                rel="noopener noreferrer"
-                href={`https://www.google.com/maps/dir/?api=1&destination=${place.position[0].latitude},${place.position[0].longitude}`}
-              >
-                <Button
-                  sx={{
-                    width: 1,
-                    whiteSpace: 'nowrap',
-                    position: 'absolute',
-                    zIndex: 999,
-                    bottom: 0,
-                  }}
-                >
-                  Ver rota no Google Maps
-                </Button>
-              </Link>
-            </MapComponent>
+              Ver rotas no Google Maps
+            </Button>
           </Grid>
         </Grid>
       </Box>
@@ -312,7 +308,7 @@ const styles = {
     // display: 'flex',
     // justifyContent: 'center',
     width: '100%',
-    height: '400px',
+    height: '350px',
   },
 
   containerGap: {

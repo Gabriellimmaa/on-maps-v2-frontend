@@ -126,6 +126,7 @@ export function PlaceCardSearch({ place }: TProps) {
 const styles = {
   container: {
     display: 'flex',
+    justifyContent: 'space-between',
     backgroundColor: '#f7f7f7',
     transition: 'all 0.3s ease',
     borderWidth: 2,

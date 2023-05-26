@@ -12,12 +12,13 @@ import {
   Tooltip,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useQuery } from '@tanstack/react-query'
-import { getCampus, getUniversity } from '@/api'
+import { getCampus, getUniversityFilter } from '@/api'
 import { LoadingSpinner } from '@/components'
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt'
 
 import {
   ModalCreateCampus,
@@ -25,13 +26,17 @@ import {
   ModalCreateEquipment,
   ModalCreateUniversity,
   ModalDelete,
+  ModalViewFeedback,
 } from '@/components/Dashboard'
 import SettingsIcon from '@mui/icons-material/Settings'
+import { NextPageContext } from 'next'
+import { useRouter } from 'next/router'
 
 const headerUniversity = ['Ações', 'Nome', 'Sigla', 'Campus']
 const headerCampus = ['Ações', 'Nome', 'Cidade', 'Universidade', 'Ambientes']
 
-export default function Dashboard() {
+function Dashboard() {
+  const router = useRouter()
   const [type, setType] = useState<'university' | 'campus' | null>(null)
   const [data, setData] = useState<any>(null)
   const [openCreateUniversity, setOpenCreateUniversity] = useState(false)
@@ -39,10 +44,11 @@ export default function Dashboard() {
   const [openCreateCategory, setOpenCreateCategory] = useState(false)
   const [openCreateEquipment, setOpenCreateEquipment] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
+  const [openFeedback, setOpenFeedback] = useState(false)
 
   const { data: universities, isLoading: isLoadingUniversities } = useQuery(
     ['university'],
-    () => getUniversity()
+    () => getUniversityFilter()
   )
 
   const { data: campuses, isLoading: isLoadingCampuses } = useQuery(
@@ -50,7 +56,13 @@ export default function Dashboard() {
     () => getCampus()
   )
 
-  // if (isLoadingUniversities || isLoadingCampuses) return <LoadingSpinner />
+  useLayoutEffect(() => {
+    const authToken = localStorage.getItem('authToken')
+
+    if (!authToken) {
+      router.push('/login')
+    }
+  }, [router])
 
   return (
     <>
@@ -78,6 +90,12 @@ export default function Dashboard() {
             onClick={() => setOpenCreateEquipment(true)}
           >
             Equipamentos
+          </Button>
+          <Button
+            startIcon={<ThumbUpAltIcon />}
+            onClick={() => setOpenFeedback(true)}
+          >
+            Feedback
           </Button>
         </Box>
         <Box>
@@ -329,6 +347,10 @@ export default function Dashboard() {
         open={openCreateEquipment}
         handleClose={() => setOpenCreateEquipment(false)}
       />
+      <ModalViewFeedback
+        open={openFeedback}
+        handleClose={() => setOpenFeedback(false)}
+      />
 
       <ModalDelete
         open={openDelete}
@@ -349,3 +371,11 @@ const styles = {
     '&:last-child td, &:last-child th': { border: 0 },
   },
 }
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  }
+}
+
+export default Dashboard

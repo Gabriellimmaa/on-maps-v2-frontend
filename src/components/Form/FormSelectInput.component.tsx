@@ -19,7 +19,10 @@ import { get as _get } from 'lodash'
 type Props = {
   id: string
   label: string
-  values: TSelectOption[]
+  values: {
+    value: any
+    label: string
+  }[]
   gridProps?: Omit<GridTypeMap['props'], 'item' | 'container'>
   selectProps?: Omit<SelectProps, 'label' | 'error'>
   inputLabelProps?: Omit<InputLabelProps, 'error'>
@@ -61,8 +64,8 @@ export const FormSelectInput = (props: Props) => {
             <Select
               label={label}
               error={!!_get(errors, `${id}.message`)}
-              {...selectProps}
               {...field}
+              {...selectProps}
             >
               {values.map((value) => (
                 <MenuItem key={value.value} value={value.value}>

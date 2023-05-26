@@ -25,7 +25,7 @@ export const ModalUpdateCategory = (props: TProps) => {
     resolver: yupResolver(createCategoryValidation()),
   })
 
-  const { mutate: mutateCategory } = useMutation(
+  const { mutateAsync: mutateCategory } = useMutation(
     ({
       categoryId,
       body,
@@ -44,7 +44,7 @@ export const ModalUpdateCategory = (props: TProps) => {
 
   const handleSubmit = async (dataForm: TPostCreateCategoryBody) => {
     try {
-      mutateCategory({
+      await mutateCategory({
         categoryId: data.id.toString(),
         body: dataForm,
       })
@@ -52,8 +52,8 @@ export const ModalUpdateCategory = (props: TProps) => {
       handleClose()
       createToast(`Categoria editada com sucesso!`, 'success')
       return
-    } catch (e) {
-      createToast(e as string, 'error')
+    } catch (error: any) {
+      createToast(error.response.data.message, 'error')
     }
   }
 

@@ -1,29 +1,35 @@
 import { Form } from '@/components/Form'
-import { Grid, IconButton, InputAdornment, Typography } from '@mui/material'
+import {
+  CircularProgress,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Typography,
+} from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { createUser } from '../../../validations/dashboard/create/validations'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useToast } from '@/hooks/useToast.hook'
 import { useState } from 'react'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { createUserValidation } from '@/validations/dashboard/manage/user'
+import { TPostCreateUserBody } from '@/types'
+import { postUserCreate } from '@/api'
+import { AxiosError } from 'axios'
+import { useMutation } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
+import { queryClient } from '@/clients'
 
 type TFormProps = {
-  name: string
+  username: string
   email: string
   password: string
   confirmPassword: string
-  manageUsers: boolean
-  managePlaces: boolean
-}
-
-type TDataToSubmit = {
-  name: string
-  email: string
-  password: string
-  role: string[]
+  manageUser: boolean
+  managePlace: boolean
 }
 
 export default function User() {
+  const router = useRouter()
   const { createToast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -38,40 +44,55 @@ export default function User() {
     event.preventDefault()
   }
 
+  const { mutateAsync: mutateUser, isLoading } = useMutation(
+    (data: TPostCreateUserBody) => postUserCreate(data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['users'])
+        router.push('/dashboard/manage/user')
+        createToast('Usuário criado com sucesso', 'success')
+      },
+      onError: (error: any) => {
+        createToast(error.response.data.message, 'error')
+      },
+    }
+  )
+
   const formHandler = useForm<TFormProps>({
     mode: 'all',
-    resolver: yupResolver(createUser()),
+    resolver: yupResolver(createUserValidation()),
     defaultValues: {
-      name: '',
+      username: '',
       email: '',
       password: '',
       confirmPassword: '',
-      manageUsers: false,
-      managePlaces: false,
+      manageUser: false,
+      managePlace: false,
     },
   })
 
   const submitForm = async (data: TFormProps) => {
-    const dataToSubmit: TDataToSubmit = {
-      name: data.name,
+    const dataToSubmit: TPostCreateUserBody = {
+      username: data.username,
       email: data.email,
       password: data.password,
-      role: [],
+      permissions: [],
     }
 
-    if (data.manageUsers) {
-      dataToSubmit.role.push('MANAGE_USER')
+    if (data.manageUser) {
+      dataToSubmit.permissions.push('MANAGE_USER')
     }
-    if (data.managePlaces) {
-      dataToSubmit.role.push('MANAGE_PLACE')
+    if (data.managePlace) {
+      dataToSubmit.permissions.push('MANAGE_PLACE')
     }
 
-    if (dataToSubmit.role.length === 0) {
+    if (dataToSubmit.permissions.length === 0) {
       createToast('Selecione pelo menos uma permissão', 'error')
       return
     }
-
-    console.log(dataToSubmit)
+    try {
+      await mutateUser(dataToSubmit)
+    } catch {}
   }
 
   return (
@@ -84,7 +105,7 @@ export default function User() {
         handler={formHandler}
         onSubmit={(data) => submitForm(data)}
       >
-        <Form.TextInput id="name" label="Nome" gridProps={styles.name} />
+        <Form.TextInput id="username" label="Nome" gridProps={styles.name} />
         <Form.TextInput id="email" label="Email" gridProps={styles.email} />
         <Form.TextInput
           id="password"
@@ -136,18 +157,24 @@ export default function User() {
           </Typography>
         </Grid>
         <Form.SwitchInput
-          id="managePlaces"
+          id="managePlace"
           label="Gerenciar Ambientes"
           gridProps={styles.managePlaces}
         />
         <Form.SwitchInput
-          id="manageUsers"
+          id="manageUser"
           label="Gerenciar Usuários"
           gridProps={styles.manageUsers}
         />
         <Form.SubmitBtn
           form="create-user"
-          btnProps={{ sx: { width: 1, height: '54px', mt: 2 } }}
+          btnProps={{
+            sx: { width: 1, height: '54px', mt: 2 },
+            startIcon: isLoading ? (
+              <CircularProgress sx={{ color: 'white' }} size={20} />
+            ) : null,
+            disabled: isLoading,
+          }}
           gridProps={{ xs: 12 }}
           handler={formHandler}
         >

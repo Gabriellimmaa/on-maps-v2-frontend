@@ -13,6 +13,16 @@ export const alignGridStart = {
   justifyContent: 'start',
 }
 
+export const alignSpaceBetween = {
+  ...flexCenterContent,
+  justifyContent: 'space-between',
+}
+
+export const flexAlingCenter = {
+  display: 'flex',
+  alignItems: 'center',
+}
+
 export const backgroundImage = (url?: string) => {
   return {
     backgroundImage: `url(${url ? url : ''})`,

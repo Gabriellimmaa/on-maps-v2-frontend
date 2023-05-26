@@ -2,6 +2,10 @@ import { DialogHeader } from '@/components/Dialog'
 import { Button, Dialog, Typography, DialogContent, Box } from '@mui/material'
 import ImageSwiper from './ImageSwiper.component'
 import { TPlace } from '@/types'
+import { queryClient } from '@/clients'
+import { useMutation } from '@tanstack/react-query'
+import { deletePlace } from '@/api'
+import { useToast } from '@/hooks/useToast.hook'
 
 type TProps = {
   open: boolean
@@ -11,38 +15,61 @@ type TProps = {
 
 export const ModalDelete = (props: TProps) => {
   const { open, handleClose, data } = props
+  const { createToast } = useToast()
+
+  const { mutateAsync: mutatePlace } = useMutation(
+    (id: string) => deletePlace(id),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['places'])
+      },
+    }
+  )
+
   if (!data) return null
 
-  const handleDelete = () => {
-    console.log('deletar' + data.id)
-    handleClose()
+  const handleDelete = async () => {
+    try {
+      await mutatePlace(data.id.toString())
+      createToast('Ambiente deletado com sucesso', 'success')
+      handleClose()
+    } catch (error: any) {
+      createToast(error.response.data.message, 'error')
+    }
   }
 
   return (
     <Dialog onClose={handleClose} aria-labelledby="config-dialog" open={open}>
       <DialogHeader id="config-dialog-title" onClose={handleClose}>
         <Typography component="span" variant="h6" fontWeight={'bold'}>
-          Deletar {data.name}
+          Deletar Ambiente
         </Typography>
       </DialogHeader>
       <DialogContent dividers>
         <Typography variant="h5" gutterBottom>
-          Tem certeza que deseja deletar o {data.category}, {`"${data.name}"`}?
+          Tem certeza que deseja deletar o {data.category} {data.name}?
         </Typography>
         <Typography variant="body1" paragraph>
           Essa ação não pode ser desfeita.
         </Typography>
 
         <Box>
-          <Typography sx={{ display: 'flex', flexDirection: 'column' }}>
-            Nome: {data.name} <br />
-            Categoria: {data.category} <br />
-            Bloco: {data.building}
+          <Typography>
+            <b>Nome:</b> {data.name} <br />
+            <b>Categoria:</b> {data.category} <br />
+            <b>Bloco:</b> {data.building}
           </Typography>
-          <Typography variant="h4" marginTop={5}>
-            Ver {data.name}
+          <Typography variant="h5" marginTop={5}>
+            Imagens
           </Typography>
-          <ImageSwiper />
+          <ImageSwiper
+            swiperProps={{
+              style: {
+                height: '200px',
+              },
+            }}
+            images={data.image}
+          />
         </Box>
 
         <Button

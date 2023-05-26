@@ -4,3 +4,6 @@ export type { TPostCreateUniversityBody } from './TPostCreateUniversityBody.type
 export type { TPostCreateCategoryBody } from './TPostCreateCategoryBody.type'
 export type { TPostCreateUserBody } from './TPostCreateUserBody.type'
 export type { TPostCreateEquipmentBody } from './TPostCreateEquipmentBody.type'
+export type { TPostImage } from './TPostImage.type'
+export type { TPostLoginUserBody } from './TPostLoginUserBody.type'
+export type { TPostCreateEventBody } from './TPostCreateEventBody.type'

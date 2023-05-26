@@ -22,7 +22,11 @@ import Logo from '@/assets/logo2Equipe.png'
 import Image from 'next/image'
 import { AccountMenu } from './AccountMenu.component'
 import Link from 'next/link'
-
+import { useUser } from '@/context/user.context'
+import { useQuery } from '@tanstack/react-query'
+import { getUser } from '@/api'
+import LoginIcon from '@mui/icons-material/Login'
+import { useRouter } from 'next/router'
 interface HeaderDrawerProps {
   children: React.ReactNode
   window?: () => Window
@@ -54,6 +58,8 @@ export const Navigation = (props: HeaderDrawerProps) => {
     appsOptions,
     sideBar,
   } = props
+  const router = useRouter()
+  const { user, setUser } = useUser()
 
   const [openCompanies, setOpenCompanies] = useState(false)
   const handleOpenCompanies = () => setOpenCompanies(true)
@@ -71,6 +77,10 @@ export const Navigation = (props: HeaderDrawerProps) => {
     } else {
       setAux({ ...aux, anchorElUser: event.currentTarget })
     }
+  }
+
+  const handleLogin = () => {
+    router.push('/login')
   }
 
   const handleClose = () => {
@@ -177,26 +187,50 @@ export const Navigation = (props: HeaderDrawerProps) => {
               />
             </ListItem>
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              <ListItem disablePadding>
-                <Typography variant="h5" component="div" sx={styles.headerName}>
-                  Gabriel Lindo
-                </Typography>
-                <Tooltip
-                  title="Administrador"
-                  placement="bottom"
-                  TransitionComponent={Zoom}
-                >
-                  <ListItemButton
-                    component="button"
-                    onClick={handleClick}
-                    sx={{ padding: 0 }}
+              {!user ? (
+                <ListItem disablePadding>
+                  <Tooltip
+                    title="Entrar"
+                    placement="bottom"
+                    TransitionComponent={Zoom}
                   >
-                    <ListItemIcon>
-                      <Avatar>U</Avatar>
-                    </ListItemIcon>
-                  </ListItemButton>
-                </Tooltip>
-              </ListItem>
+                    <ListItemButton
+                      component="button"
+                      onClick={handleLogin}
+                      sx={{ padding: 0 }}
+                    >
+                      <ListItemIcon>
+                        <LoginIcon />
+                      </ListItemIcon>
+                    </ListItemButton>
+                  </Tooltip>
+                </ListItem>
+              ) : (
+                <ListItem disablePadding>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={styles.headerName}
+                  >
+                    {user?.username}
+                  </Typography>
+                  <Tooltip
+                    title="Administrador"
+                    placement="bottom"
+                    TransitionComponent={Zoom}
+                  >
+                    <ListItemButton
+                      component="button"
+                      onClick={handleClick}
+                      sx={{ padding: 0 }}
+                    >
+                      <ListItemIcon>
+                        <Avatar>U</Avatar>
+                      </ListItemIcon>
+                    </ListItemButton>
+                  </Tooltip>
+                </ListItem>
+              )}
             </Box>
           </Toolbar>
         </AppBar>

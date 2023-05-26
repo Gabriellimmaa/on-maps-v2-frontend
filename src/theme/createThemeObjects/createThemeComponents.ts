@@ -47,6 +47,9 @@ export const createThemeComponents = (): Components<Theme> => {
       styleOverrides: {
         root: {
           borderBottom: '1px solid #E5E7EB',
+          '& .MuiTypography-body1': {
+            color: '#3c454d',
+          },
         },
       },
     },

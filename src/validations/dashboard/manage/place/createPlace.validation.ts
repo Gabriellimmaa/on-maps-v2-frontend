@@ -1,76 +1,67 @@
-import { TPlace, TPostCreatePlaceBody } from '@/types'
+import { TPostCreatePlaceBody } from '@/types'
 import { Yup } from '@/utils/formValidator'
-import { formatCurrencyToString, onlyNumbers } from '@/utils/helpers'
 
-export const createPlaceValidation = (): Yup.ObjectSchema<any> => {
+export const createPlaceValidation = () => {
   return Yup.object().shape({
-    name: Yup.string().required('Campo obrigatório'),
-    description: Yup.string().required('Campo obrigatório'),
-    category: Yup.string().required('Campo obrigatório'),
+    name: Yup.string().required(),
+    floor: Yup.string()
+      .transform((value, originalValue) => {
+        return originalValue === '' ? '0' : value
+      })
+      .default('0'),
+    description: Yup.string().required(),
+    category: Yup.string().required(),
     position: Yup.array()
       .of(
         Yup.object().shape({
-          latitude: Yup.number().required('Campo obrigatório'),
-          longitude: Yup.number().required('Campo obrigatório'),
+          latitude: Yup.number().required(),
+          longitude: Yup.number().required(),
         })
       )
-      .required('Campo obrigatório'),
-    files: Yup.array().of(
-      Yup.object().shape({
-        path: Yup.string().required('Campo obrigatório'),
-        filename: Yup.string().required('Campo obrigatório'),
+      .required(),
+    file1: Yup.mixed()
+      .test('fileExists', 'Arquivo é obrigatório', (value) => {
+        if (!value || value === '') return false
+        return true
       })
+      .test('fileSize', 'Arquivo deve ter no máximo 25mb', (value) => {
+        if (!value) return true
+        return value && value.size <= 25000000
+      }),
+    file2: Yup.mixed().test(
+      'fileSize',
+      'Arquivo deve ter no máximo 25mb',
+      (value) => {
+        if (!value) return true
+        return value && value.size <= 25000000
+      }
     ),
-    floor: Yup.number().required('Campo obrigatório'),
-    building: Yup.string().required('Campo obrigatório'),
-    campusId: Yup.number().required('Campo obrigatório'),
-    accessibility: Yup.boolean().required('Campo obrigatório'),
-    capacity: Yup.number().notRequired(),
-    equipment: Yup.array().of(Yup.string()).notRequired(),
-    date: Yup.object().shape({
-      start: Yup.string().required('Campo obrigatório'),
-      end: Yup.string().required('Campo obrigatório'),
+    file3: Yup.mixed().test(
+      'fileSize',
+      'Arquivo deve ter no máximo 25mb',
+      (value) => {
+        if (!value) return true
+        return value && value.size <= 25000000
+      }
+    ),
+    building: Yup.string().required(),
+    campusId: Yup.number().required(),
+    accessibility: Yup.boolean().required(),
+    capacity: Yup.string(),
+    equipment: Yup.array().of(Yup.string()).default([]),
+    open24h: Yup.boolean().required(),
+    date: Yup.mixed().when('open24h', {
+      is: true,
+      then: Yup.mixed().nullable().default(null),
+      otherwise: Yup.object().shape({
+        start: Yup.string().required(),
+        end: Yup.string().required(),
+      }),
     }),
-    open24h: Yup.boolean().required('Campo obrigatório'),
-    event: Yup.array().of(Yup.number()).notRequired(),
-    responsible: Yup.object()
-      .shape({
-        name: Yup.string().notRequired(),
-        email: Yup.string().email('E-mail inválido').notRequired(),
-        phone: Yup.string().required('Campo obrigatório'),
-      })
-      .notRequired(),
+    responsible: Yup.object().shape({
+      name: Yup.string(),
+      email: Yup.string().email(),
+      phone: Yup.string(),
+    }),
   })
 }
-// name: Yup.string().required(),
-// description: Yup.string().required(),
-// category: Yup.string().required(),
-// position: Yup.array()
-//   .of(
-//     Yup.object().shape({
-//       latitude: Yup.number().required(),
-//       longitude: Yup.number().required(),
-//     })
-//   )
-//   .required(),
-// files: Yup.array().of(
-//   Yup.object().shape({
-//     path: Yup.string().required(),
-//     filename: Yup.string().required(),
-//   })
-// ),
-// floor: Yup.number().required(),
-// building: Yup.string().required(),
-// campus: Yup.string().required(),
-// accessibility: Yup.boolean().required(),
-// capacity: Yup.string().notRequired(),
-// equipments: Yup.array().of(Yup.string()).notRequired(),
-// date: Yup.object().shape({
-//   start: Yup.string().required(),
-//   end: Yup.string().required(),
-// }),
-// responsible: Yup.object().shape({
-//   name: Yup.string(),
-//   email: Yup.string().email('E-mail inválido'),
-//   phone: Yup.string(),
-// }),

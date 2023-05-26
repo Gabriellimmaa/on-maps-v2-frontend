@@ -6,51 +6,66 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@/clients'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { createCustomTheme } from '@/theme'
-import AxiosInterceptor from '@/clients/http/AxiosInterceptor'
 import { DefaultLayout, DashboardLayout } from '@/layouts'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ToastProvider } from '@/hooks/useToast.hook'
 import { useRouter } from 'next/router'
+import { UserProvider } from '@/context/user.context'
+import { ModalFeedback } from '@/components/Feedback'
 
 export default function App({ Component, pageProps }: AppProps) {
-  const noThemeMui = ['Home']
-  const noLayoutComponent = ['Login', 'Custom404', 'Map']
-  const defaultLayoutComponent = ['PlaceList', 'PlaceID']
+  const [openFeedback, setOpenFeedback] = useState<boolean>(false)
+  const noThemeMui = ['']
+  const noLayoutComponent = ['Home', 'Login', 'Custom404', 'Map']
 
-  const router = useRouter()
+  const checkComponentName = Component.displayName
+    ? Component.displayName
+    : Component.name
 
-  if (router.pathname.startsWith('/components')) {
-    return null
-  }
+  useEffect(() => {
+    const checkUserFeedback = localStorage.getItem('userFeedback')
 
-  if (noThemeMui.includes(Component.name)) {
+    if (checkUserFeedback) {
+      return
+    }
+
+    // const tempoExibicaoModal = 120000 // 2 minutos
+    const tempoExibicaoModal = 5000 // 5 segundos
+
+    const timeoutId = setTimeout(() => {
+      setOpenFeedback(true)
+    }, tempoExibicaoModal)
+
+    // Limpe o timeout ao desmontar o componente
+    return () => clearTimeout(timeoutId)
+  }, [])
+
+  if (noThemeMui.includes(checkComponentName)) {
     return defaultProvider({
       children: <Component {...pageProps} />,
       layout: React.Fragment,
       theme: false,
+      openFeedback,
+      setOpenFeedback,
     })
   }
 
-  if (noLayoutComponent.includes(Component.name)) {
+  if (noLayoutComponent.includes(checkComponentName)) {
     return defaultProvider({
       children: <Component {...pageProps} />,
       layout: React.Fragment,
       theme: true,
-    })
-  }
-
-  if (defaultLayoutComponent.includes(Component.name)) {
-    return defaultProvider({
-      children: <Component {...pageProps} />,
-      layout: DefaultLayout,
-      theme: true,
+      openFeedback,
+      setOpenFeedback,
     })
   }
 
   return defaultProvider({
     children: <Component {...pageProps} />,
-    layout: DashboardLayout,
+    layout: DefaultLayout,
     theme: true,
+    openFeedback,
+    setOpenFeedback,
   })
 }
 
@@ -58,29 +73,39 @@ function defaultProvider({
   children,
   layout,
   theme = true,
+  openFeedback,
+  setOpenFeedback,
 }: {
   children: React.ReactNode
   layout: any
   theme: boolean
+  openFeedback?: boolean
+  setOpenFeedback?: any
 }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      {theme ? (
-        <ThemeProvider theme={createCustomTheme()}>
-          <CssBaseline />
-          <AxiosInterceptor>
-            <ToastProvider>
-              {React.createElement(layout, {}, children)}
-            </ToastProvider>
-          </AxiosInterceptor>
-        </ThemeProvider>
-      ) : (
-        <AxiosInterceptor>
-          <ToastProvider>
-            {React.createElement(layout, {}, children)}
-          </ToastProvider>
-        </AxiosInterceptor>
-      )}
-    </QueryClientProvider>
+    <NoSSR>
+      <QueryClientProvider client={queryClient}>
+        <MapInfoProvider>
+          <UserProvider>
+            {theme ? (
+              <ThemeProvider theme={createCustomTheme()}>
+                <CssBaseline />
+                <ToastProvider>
+                  {React.createElement(layout, {}, children)}
+                  <ModalFeedback
+                    open={openFeedback ? openFeedback : false}
+                    handleClose={() => setOpenFeedback(false)}
+                  />
+                </ToastProvider>
+              </ThemeProvider>
+            ) : (
+              <ToastProvider>
+                {React.createElement(layout, {}, children)}
+              </ToastProvider>
+            )}
+          </UserProvider>
+        </MapInfoProvider>
+      </QueryClientProvider>
+    </NoSSR>
   )
 }

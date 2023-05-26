@@ -13,6 +13,7 @@ import React from 'react'
 import {
   ModalDelete,
   ImageSwiperDelete,
+  ModalEdit,
 } from '@/components/Dashboard/manage/place'
 
 import { createPlaceValidation } from '@/validations/dashboard/manage/place'
@@ -31,6 +32,7 @@ type TProps = {
 export default function EditPlace(props: TProps) {
   const [markers, setMarkers] = useState<any>(null)
   const [openDelete, setOpenDelete] = useState(false)
+  const [openEdit, setOpenEdit] = useState(false)
 
   const formHandler = useForm<{
     name: string
@@ -258,6 +260,11 @@ export default function EditPlace(props: TProps) {
       <ModalDelete
         open={openDelete}
         handleClose={() => setOpenDelete(false)}
+        data={props?.data}
+      />
+      <ModalEdit
+        open={openEdit}
+        handleClose={() => setOpenEdit(false)}
         data={props?.data}
       />
     </>

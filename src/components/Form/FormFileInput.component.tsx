@@ -10,7 +10,6 @@ import { Controller, useFormContext } from 'react-hook-form'
 import { useFormComponents } from './context/FormComponents.context'
 import { get as _get } from 'lodash'
 import FileUploadOutlined from '@mui/icons-material/FileUploadOutlined'
-
 type Props = {
   id: string
   accept?: string
@@ -32,7 +31,7 @@ export const FormFileInput = (props: Props) => {
     gridProps,
     id,
     helperText,
-    accept,
+    accept = 'image/*',
     placeholder = 'Carregar Arquivo...',
   } = props
   const [buttonText, setButtonText] = useState<string>(placeholder)
@@ -43,17 +42,17 @@ export const FormFileInput = (props: Props) => {
   } = useFormContext<any>()
 
   const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ): File | undefined => {
     const { files } = e.target
     const fileName = files?.[0]?.name
     if (fileName) {
       setButtonText(fileName)
-      if (fileName.length > 20) {
+      if (fileName.length > 25) {
         setButtonText(
           `${fileName.substring(0, 9)}...${fileName.substring(
-            fileName.length - 7,
-          )}`,
+            fileName.length - 7
+          )}`
         )
       }
     }
@@ -70,7 +69,7 @@ export const FormFileInput = (props: Props) => {
           <>
             <label htmlFor={`${id}-hidden-input`}>
               <Button
-                endIcon={<FileUploadOutlined />}
+                startIcon={<FileUploadOutlined />}
                 color="secondary"
                 {...btnProps}
                 id={id}

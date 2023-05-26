@@ -20,68 +20,88 @@ import dynamic from 'next/dynamic'
 import { DataCampus, DataMapCategories, DataEquipaments } from '@/data'
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices'
 import {
-  TEquipaments,
+  TPostImage,
   TMapCategories,
   TPlace,
   TPostCreatePlaceBody,
+  TPostDiscordWebhookResponse,
 } from '@/types'
 import { Omit } from 'lodash'
-import { getCampus, postPlace } from '@/api'
+import {
+  getCampus,
+  getCategory,
+  getEquipment,
+  postDiscordWebhook,
+  postPlace,
+} from '@/api'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { queryClient } from '@/clients'
 import { LoadingSpinner } from '@/components'
 import { flexCenterContent } from '@/utils/cssInJsBlocks'
+import { useToast } from '@/hooks/useToast.hook'
+import { useRouter } from 'next/router'
+import { createPlaceValidation } from '@/validations/dashboard/manage/place'
+import { onlyNumbers } from '@/utils/helpers'
+import AddIcon from '@mui/icons-material/Add'
+import ImageIcon from '@mui/icons-material/Image'
 
 const MapComponent = dynamic(() => import('@/components/Map/Map.component'), {
   loading: () => <p>loading...</p>,
   ssr: false,
 })
 
-type formProps = Omit<
-  TPostCreatePlaceBody,
-  'id' | 'event' | 'image' | 'date' | 'campus'
-> & {
-  area: any
-}
+type formProps = any
 export default function Place() {
+  const router = useRouter()
   const [markers, setMarkers] = useState<any>(null)
+  const { createToast } = useToast()
   const { palette } = useTheme()
 
   const formHandler = useForm<formProps>({
     mode: 'all',
-    // resolver: yupResolver(createPlace()),
-    // defaultValues: {
-    //   name: '',
-    //   category: undefined,
-    //   description: '',
-    //   floor: 0,
-    //   building: '',
-    //   campus: undefined,
-    //   capacity: null,
-    //   equipment: [],
-    //   accessibility: false,
-    //   open24h: false,
-    //   position: [],
-    // },
+    resolver: yupResolver(createPlaceValidation()),
+    defaultValues: {
+      equipment: [],
+    },
   })
   const watchArea = formHandler.watch('area')
   const watchCampus = formHandler.watch('campusId')
   const watch24h = formHandler.watch('open24h')
+  const watchFile1 = formHandler.watch('file1')
+  const watchFile2 = formHandler.watch('file2')
+  const watchFile3 = formHandler.watch('file3')
 
   const { data: responseCampus, isLoading: isLoadingCampus } = useQuery(
     ['campus'],
     () => getCampus()
   )
 
-  const { mutate } = useMutation(postPlace, {
+  const { data: responseCategory, isLoading: isLoadingCategory } = useQuery(
+    ['category'],
+    () => getCategory()
+  )
+
+  const { data: responseEquipment, isLoading: isLoadingEquipment } = useQuery(
+    ['equipment'],
+    () => getEquipment()
+  )
+
+  const { mutateAsync } = useMutation(postPlace, {
     onSuccess: () => {
       queryClient.invalidateQueries(['places'])
       formHandler.reset()
+      createToast('Ambiente criado com sucesso', 'success')
+      router.push('/dashboard/manage/place')
     },
-    onError: (error) => {
-      console.log(error)
+    onError: (error: any) => {
+      createToast(error.response.data.message, 'error')
     },
   })
+
+  const { mutateAsync: mutateDiscordImage } = useMutation(
+    postDiscordWebhook,
+    {}
+  )
 
   useEffect(() => {
     if (watchArea) {
@@ -101,60 +121,71 @@ export default function Place() {
     }
   }, [formHandler, markers, watchArea])
 
-  // const latitude = DataCampus.find(
-  //   (campus) => campus.value === watchCampus
-  // )?.lat
-  // const longitude = DataCampus.find(
-  //   (campus) => campus.value === watchCampus
-  // )?.lng
   const latitude = -23.5505199
   const longitude = -46.6333094
 
-  const submitForm = async (data: formProps) => {
-    const dataToSubmit: any = {
+  const handleSubmit = async (data: formProps) => {
+    const files = [data.file1, data.file2, data.file3]
+    const formData = new FormData()
+    files.forEach((file, index) => {
+      formData.append(`file${index + 1}`, file)
+    })
+    const responseDiscord = await mutateDiscordImage(formData)
+
+    const images = responseDiscord.attachments.map((attachment) => {
+      const data: TPostImage = {
+        url: attachment.url,
+        name: attachment.filename,
+        size: attachment.size,
+        type: attachment.content_type,
+      }
+      return data
+    })
+
+    const dataToSubmit: TPostCreatePlaceBody = {
       name: data.name,
+      category: data.category,
       description: data.description,
-      category: data.category as TMapCategories,
-      position: data.position,
-      campusId: data.campusId ? data.campusId : 1,
-      // image: data.image,
-      open24h: data.open24h,
-      // floor: parseInt(data.floor as number),
+      floor: parseInt(data.floor),
       building: data.building,
-      accessibility: data.accessibility,
+      campusId: data.campusId,
+      capacity: parseInt(data.capacity),
       equipment: data.equipment,
-      // capacity: data.capacity ? parseInt(data.capacity as number) : undefined,
-      event: [],
-      files: [
-        {
-          path: 'https://exemplo.com/imagem1.jpg',
-          filename: 'Imagem 1',
-        },
-        {
-          path: 'https://exemplo.com/imagem2.jpg',
-          filename: 'Imagem 2',
-        },
-      ],
-      date: {
-        start: '2023-05-13T12:00:00.000Z',
-        end: '2023-05-13T15:30:00.000Z',
-      },
+      accessibility: data.accessibility,
+      open24h: data.open24h,
+      position: data.position,
       responsible: {
-        name: data.responsible?.name,
-        email: data.responsible?.email,
-        phone: data.responsible?.phone
-          ? data.responsible?.phone
-          : '14997391223',
+        name: data.responsible.name,
+        email: data.responsible.email,
+        phone: onlyNumbers(data.responsible.phone),
       },
+      date: data.open24h ? undefined : data.date,
+      event: [],
+      image: images,
     }
-    console.log(dataToSubmit)
 
-    // await postCreatePlace(dataToSubmit)
-
-    mutate(dataToSubmit)
+    try {
+      await mutateAsync(dataToSubmit)
+    } catch {}
   }
 
-  if (isLoadingCampus) return <LoadingSpinner />
+  if (isLoadingCampus || isLoadingCategory || isLoadingEquipment)
+    return <LoadingSpinner />
+
+  if (!responseEquipment || !responseCategory || !responseCampus) {
+    return (
+      <Typography variant="h4" textAlign="center">
+        {!responseCampus &&
+          'Não é possível criar um ambiente sem mesmo ao ter um campus'}
+        <br />
+        {!responseCategory &&
+          'Não é possível criar um ambiente sem mesmo ao ter um categoria'}
+        <br />
+        {!responseEquipment &&
+          'Não é possível criar um ambiente sem mesmo ao ter um equipamento'}
+      </Typography>
+    )
+  }
 
   if (!responseCampus)
     return (
@@ -177,11 +208,7 @@ export default function Place() {
         Criar Local
       </Typography>
 
-      <Form
-        id="create-place"
-        handler={formHandler}
-        onSubmit={(data) => submitForm(data)}
-      >
+      <Form id="create-place" handler={formHandler} onSubmit={handleSubmit}>
         <Form.TextInput
           id="name"
           label="Nome do local"
@@ -191,11 +218,9 @@ export default function Place() {
           id="category"
           label="Categoria"
           gridProps={styles.gridCategory}
-          values={DataMapCategories.filter(
-            (category) => category.value !== 'todos'
-          ).map((category) => ({
-            value: category.value,
-            label: category.title,
+          values={responseCategory?.map((category: any) => ({
+            value: category.name,
+            label: category.name,
           }))}
         />
         <Form.TextInput
@@ -239,23 +264,9 @@ export default function Place() {
           label="Equipamentos"
           gridProps={styles.gridEquipaments}
           selectProps={styles.selectEquipaments}
-          // values={DataEquipaments.map((equipament, _index) => ({
-          //   value: equipament.value,
-          //   label: (
-          //     <Typography
-          //       key={_index}
-          //       sx={{ display: 'flex', alignItems: 'center' }}
-          //     >
-          //       {createElement(equipament.icon, {
-          //         sx: { mr: 1 },
-          //       })}{' '}
-          //       {equipament.title}
-          //     </Typography>
-          //   ),
-          // }))}
-          values={DataEquipaments.map((equipament) => ({
-            value: equipament.value,
-            label: equipament.title,
+          values={responseEquipment.map((equipament) => ({
+            value: equipament.name,
+            label: equipament.name,
           }))}
         />
 
@@ -269,20 +280,74 @@ export default function Place() {
           label="Aberto 24h"
           gridProps={styles.gridOpen24h}
         />
-        <Form.DatePickerInput
+        <Form.TimePicketInput
           id="date.start"
-          label="Data de Início"
+          label="Horário de Início"
           gridProps={styles.gridDatePicker}
           disabled={watch24h}
         />
-        <Form.DatePickerInput
+        <Form.TimePicketInput
           id="date.end"
           label="Data de Término"
           gridProps={styles.gridDatePicker}
           disabled={watch24h}
         />
         <Grid item xs={12}>
-          <Typography variant="h4" mb={2}>
+          <Typography variant="h4" sx={{ mb: 2 }}>
+            Imagens
+          </Typography>
+        </Grid>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'start',
+            width: '100%',
+            gap: 2,
+          }}
+        >
+          <Form.FileInput
+            id="file1"
+            placeholder="Adicionar Imagem"
+            btnProps={{
+              sx: {
+                borderStyle: watchFile1 ? 'solid' : 'dashed',
+                ...styles.buttonFile,
+              },
+              startIcon: watchFile1 ? <ImageIcon /> : <AddIcon />,
+              fullWidth: true,
+            }}
+          />
+          {watchFile1 && (
+            <Form.FileInput
+              id="file2"
+              placeholder="Adicionar Imagem"
+              btnProps={{
+                sx: {
+                  borderStyle: watchFile2 ? 'solid' : 'dashed',
+                  ...styles.buttonFile,
+                },
+                startIcon: watchFile2 ? <ImageIcon /> : <AddIcon />,
+                fullWidth: true,
+              }}
+            />
+          )}
+          {watchFile2 && (
+            <Form.FileInput
+              id="file3"
+              placeholder="Adicionar Imagem"
+              btnProps={{
+                sx: {
+                  borderStyle: watchFile3 ? 'solid' : 'dashed',
+                  ...styles.buttonFile,
+                },
+                startIcon: watchFile3 ? <ImageIcon /> : <AddIcon />,
+                fullWidth: true,
+              }}
+            />
+          )}
+        </Box>
+        <Grid item xs={12}>
+          <Typography variant="h4" mb={2} mt={2}>
             Selecione o local no mapa
           </Typography>
         </Grid>
@@ -422,5 +487,13 @@ const styles = {
     marginRight: '14px',
     marginBottom: 0,
     marginLeft: '14px',
+  },
+  buttonFile: {
+    height: '150px',
+    backgroundColor: 'none',
+    borderColor: 'primary.main',
+    borderWidth: '2px',
+    display: 'flex',
+    flexDirection: 'column',
   },
 }

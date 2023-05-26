@@ -1,4 +1,4 @@
-import { TEquipaments } from '@/types/TEquipment.type'
+import { TEquipment } from '@/types/TEquipment.type'
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import AcUnitIcon from '@mui/icons-material/AcUnit'
 import FreeBreakfastIcon from '@mui/icons-material/FreeBreakfast'
@@ -18,7 +18,7 @@ import WifiIcon from '@mui/icons-material/Wifi'
 type TEquipamentsData = {
   title: string
   icon: any
-  value: TEquipaments
+  value: any
 }[]
 
 export const DataEquipaments: TEquipamentsData = [

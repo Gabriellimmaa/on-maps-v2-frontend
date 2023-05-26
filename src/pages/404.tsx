@@ -46,3 +46,5 @@ const styles = {
     },
   },
 }
+
+Custom404.displayName = 'Custom404'

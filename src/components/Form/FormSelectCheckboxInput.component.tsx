@@ -47,6 +47,17 @@ type Props = {
   defaultValue?: string
 }
 
+const ITEM_HEIGHT = 48
+const ITEM_PADDING_TOP = 8
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+}
+
 export const FormSelectCheckboxInput = (props: Props) => {
   useFormComponents()
 
@@ -84,13 +95,18 @@ export const FormSelectCheckboxInput = (props: Props) => {
               error={!!_get(errors, `${id}.message`)}
               multiple
               value={[...field.value]}
-              {...selectProps}
+              MenuProps={MenuProps}
               onChange={(event) => {
                 field.onChange(event.target.value)
               }}
+              {...selectProps}
             >
               {values.map((data) => (
                 <MenuItem key={data.value} value={data.value}>
+                  <Checkbox
+                    checked={field.value.indexOf(data.value) > -1}
+                    sx={{ p: 0, pr: 0.5, height: 10 }}
+                  />
                   {data.label}
                 </MenuItem>
               ))}

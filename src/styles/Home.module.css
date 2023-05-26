@@ -32,7 +32,7 @@
 }
 
 .containerButtons {
-  width: 280px;
+  width: 50%;
   background-color: #ffffff;
   position: absolute;
   left: 50%;
@@ -243,6 +243,7 @@
 }
 
 @-webkit-keyframes FadeFloat {
+
   0%,
   100% {
     opacity: 0;
@@ -255,6 +256,7 @@
 }
 
 @keyframes FadeFloat {
+
   0%,
   100% {
     opacity: 0;

@@ -1,6 +1,16 @@
 import { DialogHeader } from '@/components/Dialog'
-import { Button, Dialog, Typography, DialogContent } from '@mui/material'
-import { TUser } from '../types'
+import {
+  Button,
+  Dialog,
+  Typography,
+  DialogContent,
+  CircularProgress,
+} from '@mui/material'
+import { TUser } from '@/types'
+import { useToast } from '@/hooks/useToast.hook'
+import { queryClient } from '@/clients'
+import { useMutation } from '@tanstack/react-query'
+import { deleteUser } from '@/api'
 
 type TProps = {
   open: boolean
@@ -10,12 +20,29 @@ type TProps = {
 
 export const ModalDelete = (props: TProps) => {
   const { open, handleClose, data } = props
-  if (!data) return null
+  const { createToast } = useToast()
+  const { mutateAsync, isLoading } = useMutation(
+    (id: string) => deleteUser(id),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['users'])
+        createToast('Usuário deletado com sucesso!', 'success')
+        handleClose()
+      },
+      onError: (error: any) => {
+        createToast(error.response.data.message, 'error')
+      },
+    }
+  )
 
-  const handleDelete = () => {
-    console.log('deletar' + data.id)
-    handleClose()
+  const handleDelete = async () => {
+    if (!data) return
+    try {
+      await mutateAsync(data.id.toString())
+    } catch {}
   }
+
+  if (!data) return null
 
   return (
     <Dialog onClose={handleClose} aria-labelledby="config-dialog" open={open}>
@@ -26,8 +53,7 @@ export const ModalDelete = (props: TProps) => {
       </DialogHeader>
       <DialogContent dividers>
         <Typography variant="h5" gutterBottom>
-          Tem certeza que deseja deletar o usuário {data.firstName}{' '}
-          {data.lastName}?
+          Tem certeza que deseja deletar o usuário {data.username}?
         </Typography>
         <Typography variant="body1" paragraph>
           Essa ação não pode ser desfeita.
@@ -35,6 +61,12 @@ export const ModalDelete = (props: TProps) => {
 
         <Button
           onClick={handleDelete}
+          startIcon={
+            isLoading ? (
+              <CircularProgress sx={{ color: 'white' }} size={20} />
+            ) : null
+          }
+          disabled={isLoading}
           sx={{
             width: 1,
             mt: 2,

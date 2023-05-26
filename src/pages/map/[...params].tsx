@@ -32,6 +32,8 @@ export default function Map() {
       if (isNaN(Number(latitude)) || isNaN(Number(longitude))) {
         router.push('/404')
       } else {
+        console.log(latitude)
+        console.log(longitude)
         setPosition({
           latitude: Number(latitude),
           longitude: Number(longitude),
@@ -39,6 +41,8 @@ export default function Map() {
       }
     }
   }, [params])
+
+  console.log(position)
 
   return (
     <div
@@ -58,7 +62,7 @@ export default function Map() {
           top: 0,
         }}
       >
-        <MarkerComponent
+        {/* <MarkerComponent
           latitude={position.latitude}
           longitude={position.longitude}
           category="lanchonete"
@@ -103,10 +107,11 @@ export default function Map() {
             createdAt: '2022-01-01',
             updatedAt: '2022-01-02',
           }}
-        />
+        /> */}
       </MapComponent>
     </div>
   )
 }
 
 Map.ssr = false
+Map.displayName = 'Map'

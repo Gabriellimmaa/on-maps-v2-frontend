@@ -1,9 +1,9 @@
 import { TCampus } from './TCampus.type'
-import { TEquipaments } from './TEquipment.type'
+import { TImage } from './TImage.type'
 import { TMapCategories } from './TMapCategories.type'
 
 export type TPlace = {
-  id: string
+  id: number
   name: string
   description: string
   category: TMapCategories
@@ -11,17 +11,14 @@ export type TPlace = {
     latitude: number
     longitude: number
   }[]
-  image: {
-    url: string
-    name: string
-  }[]
+  image: TImage[]
   floor: number
   building: string
   campus: TCampus
   campusId: number
   accessibility: boolean
   capacity?: number
-  equipment: TEquipaments[]
+  equipment: string[]
   date?: {
     start: string
     end: string
@@ -32,7 +29,7 @@ export type TPlace = {
     email?: string
     phone: string
   }
-  event?: {
+  event: {
     name: string
     description: string
     date: Date

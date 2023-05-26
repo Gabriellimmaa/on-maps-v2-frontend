@@ -36,7 +36,7 @@ export const ModalDelete = (props: TProps) => {
   const { open, handleClose, data, type } = props
   const { createToast } = useToast()
 
-  const { mutate: mutateEquipment } = useMutation(
+  const { mutateAsync: mutateEquipment } = useMutation(
     (data: string) => deleteEquipment(data),
     {
       onSuccess: () => {
@@ -45,7 +45,7 @@ export const ModalDelete = (props: TProps) => {
     }
   )
 
-  const { mutate: mutateCategory } = useMutation(
+  const { mutateAsync: mutateCategory } = useMutation(
     (data: string) => deleteCategory(data),
     {
       onSuccess: () => {
@@ -54,7 +54,7 @@ export const ModalDelete = (props: TProps) => {
     }
   )
 
-  const { mutate: mutateUniversity } = useMutation(
+  const { mutateAsync: mutateUniversity } = useMutation(
     (data: string) => deleteUniversity(data),
     {
       onSuccess: () => {
@@ -63,7 +63,7 @@ export const ModalDelete = (props: TProps) => {
     }
   )
 
-  const { mutate: mutateCampus } = useMutation(
+  const { mutateAsync: mutateCampus } = useMutation(
     (data: string) => deleteCampus(data),
     {
       onSuccess: () => {
@@ -77,34 +77,34 @@ export const ModalDelete = (props: TProps) => {
   const title = EType[type]
   const checkType = ETypeModificator[type]
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     try {
       if (type === 'campus') {
-        mutateCampus(data.id.toString())
+        await mutateCampus(data.id.toString())
         handleClose()
         createToast(`Campus deletado com sucesso!`, 'success')
         return
       }
       if (type === 'university') {
-        mutateUniversity(data.id.toString())
+        await mutateUniversity(data.id.toString())
         handleClose()
         createToast(`Universidade deletada com sucesso!`, 'success')
         return
       }
       if (type === 'category') {
-        mutateCategory(data.id.toString())
+        await mutateCategory(data.id.toString())
         handleClose()
         createToast(`Categoria deletada com sucesso!`, 'success')
         return
       }
       if (type === 'equipment') {
-        mutateEquipment(data.id.toString())
+        await mutateEquipment(data.id.toString())
         handleClose()
         createToast(`Equipamento deletado com sucesso!`, 'success')
         return
       }
-    } catch (e) {
-      createToast(e as string, 'error')
+    } catch (error: any) {
+      createToast(error.response.data.message, 'error')
     }
   }
 

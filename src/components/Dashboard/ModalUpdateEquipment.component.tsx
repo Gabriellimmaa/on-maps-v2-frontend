@@ -25,7 +25,7 @@ export const ModalUpdateEquipment = (props: TProps) => {
     resolver: yupResolver(createCategoryValidation()),
   })
 
-  const { mutate: mutateEquipment } = useMutation(
+  const { mutateAsync: mutateEquipment } = useMutation(
     ({ id, body }: { id: string; body: TPostCreateCategoryBody }) =>
       putEquipment(id, body),
     {
@@ -39,7 +39,7 @@ export const ModalUpdateEquipment = (props: TProps) => {
 
   const handleSubmit = async (dataForm: TPostCreateCategoryBody) => {
     try {
-      mutateEquipment({
+      await mutateEquipment({
         id: data.id.toString(),
         body: dataForm,
       })
@@ -47,8 +47,8 @@ export const ModalUpdateEquipment = (props: TProps) => {
       handleClose()
       createToast(`Equipamento editada com sucesso!`, 'success')
       return
-    } catch (e) {
-      createToast(e as string, 'error')
+    } catch (error: any) {
+      createToast(error.response.data.message, 'error')
     }
   }
 

@@ -6,8 +6,10 @@ export type TCampus = {
   name: string
   city: string
   state: string
-  phone: string
-  email: string
+  position: {
+    latitude: number
+    longitude: number
+  }[]
   university: TUniversity
   universityId: number
   place: TPlace[]

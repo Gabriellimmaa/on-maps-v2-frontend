@@ -1,1 +1,1 @@
-export { characterLimit } from "./characterLimit";
+export { characterLimit } from './characterLimit'

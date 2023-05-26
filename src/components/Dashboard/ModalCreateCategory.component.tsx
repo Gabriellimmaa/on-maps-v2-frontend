@@ -51,23 +51,24 @@ export const ModalCreateCategory = (props: TProps) => {
     () => getCategory()
   )
 
-  const { mutate: mutateUniversity } = useMutation(
+  const { mutateAsync: mutateUniversity } = useMutation(
     (data: TPostCreateCategoryBody) => postCategory(data),
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries(['category'])
+        formHandler.reset()
+        createToast(`Categoria criada com sucesso!`, 'success')
+      },
+      onError: (error: any) => {
+        createToast(error.response.data.message, 'error')
       },
     }
   )
 
   const handleSubmit = async (data: TPostCreateCategoryBody) => {
     try {
-      mutateUniversity(data)
-      formHandler.reset()
-      createToast(`Categoria criada com sucesso!`, 'success')
-    } catch (e) {
-      createToast(e as string, 'error')
-    }
+      await mutateUniversity(data)
+    } catch {}
   }
 
   if (isLoadingCategories) <LoadingSpinner />

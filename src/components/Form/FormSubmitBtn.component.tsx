@@ -28,7 +28,7 @@ export const FormSubmitBtn = (props: Props) => {
 
   const loading = (
     <>
-      <CircularProgress color="inherit" size={20} sx={{ mr: 1.5 }} />
+      <CircularProgress size={20} sx={{ mr: 1.5, color: 'white' }} />
       Enviando...
     </>
   )
@@ -36,7 +36,7 @@ export const FormSubmitBtn = (props: Props) => {
   return (
     <Grid sx={{ ...flexCenterContent }} {...gridProps} item>
       <Button
-        id="submit"
+        id={`${form}-submit-btn`}
         type="submit"
         size="large"
         {...btnProps}

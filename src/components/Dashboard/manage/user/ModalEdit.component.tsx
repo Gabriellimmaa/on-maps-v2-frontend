@@ -1,10 +1,20 @@
 import { DialogHeader } from '@/components/Dialog'
 import { Form } from '@/components/Form'
 import { DataRole } from '@/data'
-import { Dialog, Typography, DialogContent } from '@mui/material'
+import {
+  Dialog,
+  Typography,
+  DialogContent,
+  CircularProgress,
+} from '@mui/material'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { TUser } from '../types'
+import { TPostCreateUserBody, TUser } from '@/types'
+import { queryClient } from '@/clients'
+import { useMutation } from '@tanstack/react-query'
+import { putUser } from '@/api'
+import { useToast } from '@/hooks/useToast.hook'
+import { removeMatchingAttributes } from '@/utils/helpers'
 
 type TProps = {
   open: boolean
@@ -14,26 +24,48 @@ type TProps = {
 
 export const ModalEdit = (props: TProps) => {
   const { open, handleClose, data } = props
+  const { createToast } = useToast()
 
   const formHandler = useForm<{
-    firstName: string
-    lastName: string
+    username: string
     email: string
     MANAGE_PLACE: boolean
     MANAGE_USER: boolean
   }>({
     mode: 'all',
+    defaultValues: {
+      username: data?.username,
+      email: data?.email,
+      MANAGE_PLACE: data?.permissions.includes('MANAGE_PLACE'),
+      MANAGE_USER: data?.permissions.includes('MANAGE_USER'),
+    },
   })
 
   useEffect(() => {
     formHandler.reset({
-      firstName: data?.firstName,
-      lastName: data?.lastName,
+      username: data?.username,
       email: data?.email,
-      MANAGE_PLACE: data?.role.includes('MANAGE_PLACE'),
-      MANAGE_USER: data?.role.includes('MANAGE_USER'),
+      MANAGE_PLACE: data?.permissions.includes('MANAGE_PLACE'),
+      MANAGE_USER: data?.permissions.includes('MANAGE_USER'),
     })
   }, [data, formHandler])
+
+  const { mutateAsync, isLoading } = useMutation(
+    ({ id, body }: { id: string; body: Partial<TPostCreateUserBody> }) =>
+      putUser(id, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['users'])
+        queryClient.invalidateQueries(['user', data?.id])
+        createToast('Usuário editado com sucesso!', 'success')
+        handleClose()
+      },
+      onError: (error: any) => {
+        formHandler.reset()
+        createToast(error.response.data.message, 'error')
+      },
+    }
+  )
 
   if (!data) return null
 
@@ -48,31 +80,29 @@ export const ModalEdit = (props: TProps) => {
         <Form
           id="edit-user"
           handler={formHandler}
-          onSubmit={async (data) => {
-            const roles = []
-            if (data.MANAGE_PLACE) roles.push(DataRole.MANAGE_PLACE.value)
-            if (data.MANAGE_USER) roles.push(DataRole.MANAGE_USER.value)
-            const dataToSubmit = {
-              firstName: data.firstName,
-              lastName: data.lastName,
-              email: data.email,
-              role: roles,
-            }
-            console.log(dataToSubmit)
-            handleClose()
+          onSubmit={async (dataForm) => {
+            try {
+              const dataToSubmit: Partial<TPostCreateUserBody> = {
+                username: dataForm.username,
+                email: dataForm.email,
+              }
+              const permissions: any = []
+              if (dataForm.MANAGE_PLACE)
+                permissions.push(DataRole.MANAGE_PLACE.value)
+              if (dataForm.MANAGE_USER)
+                permissions.push(DataRole.MANAGE_USER.value)
+              if (permissions.length != 0)
+                dataToSubmit.permissions = permissions
+
+              removeMatchingAttributes(dataToSubmit, data)
+
+              await mutateAsync({ id: data.id.toString(), body: dataToSubmit })
+              handleClose()
+            } catch {}
           }}
         >
-          <Form.TextInput
-            id="firstName"
-            label="Nome"
-            gridProps={styles.gridxs12md6}
-          />
-          <Form.TextInput
-            id="lastName"
-            label="Sobrenome"
-            gridProps={styles.gridxs12md6}
-          />
-          <Form.TextInput id="email" label="E-mail" disabled />
+          <Form.TextInput id="username" label="Nome" />
+          <Form.TextInput id="email" label="E-mail" />
 
           <Form.SwitchInput
             id="MANAGE_PLACE"
@@ -102,6 +132,10 @@ export const ModalEdit = (props: TProps) => {
               sx: {
                 width: 1,
               },
+              startIcon: isLoading ? (
+                <CircularProgress sx={{ color: 'white' }} size={20} />
+              ) : null,
+              disabled: isLoading,
             }}
             handler={formHandler}
           >

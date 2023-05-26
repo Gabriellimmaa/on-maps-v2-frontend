@@ -12,23 +12,57 @@ import {
   Box,
   useTheme,
   Theme,
+  CircularProgress,
 } from '@mui/material'
 import { Form } from '@/components/Form'
 import { useForm } from 'react-hook-form'
 import { loginValidation } from '@/validations/login'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
+import { useMutation } from '@tanstack/react-query'
+import { postUserLogin } from '@/api'
+import { TPostLoginUserBody } from '@/types'
+import api from '@/clients/http/http.client'
+import { useToast } from '@/hooks/useToast.hook'
+import { AxiosError } from 'axios'
+import { useUser } from '@/context/user.context'
+import PlaceIcon from '@mui/icons-material/Place'
 
 export default function Login() {
   const theme = useTheme()
   const styles = makeStyles(theme)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const items = Array(10).fill(null)
+  const { createToast } = useToast()
+  const { setUser } = useUser()
 
-  const formHandler = useForm<{
-    username: string
-    password: string
-  }>({
+  const { mutateAsync: login, isLoading } = useMutation(
+    async (data: TPostLoginUserBody) => postUserLogin(data),
+    {
+      onSuccess: async (data) => {
+        const authToken = data.authToken
+        const user = data.user
+
+        localStorage.setItem('authToken', authToken)
+        localStorage.setItem('user', JSON.stringify(user))
+        setUser(user)
+        createToast('Login realizado com sucesso!', 'success')
+        window.location.href = '/dashboard'
+      },
+      onError: (error: any) => {
+        createToast(error.response.data.message, 'error')
+      },
+    }
+  )
+
+  const handleSubmit = async (data: TPostLoginUserBody) => {
+    try {
+      await login({
+        email: data.email,
+        password: data.password,
+      })
+    } catch {}
+  }
+
+  const formHandler = useForm<TPostLoginUserBody>({
     mode: 'all',
     resolver: yupResolver(loginValidation()),
   })
@@ -56,19 +90,17 @@ export default function Login() {
           >
             <Box px={4}>
               <Typography variant="h4" sx={styles.title}>
-                Bem-vindo ao login 👋
+                Bem-vindo colaborador 👋
               </Typography>
               <Form
                 id="login-form"
                 handler={formHandler}
-                onSubmit={async (data) => {
-                  console.log(data)
-                }}
+                onSubmit={handleSubmit}
                 sx={styles.form}
               >
                 <Form.TextInput
-                  id="username"
-                  label="Usuário"
+                  id="email"
+                  label="Email"
                   gridProps={{
                     pl: '0 !important',
                   }}
@@ -84,7 +116,7 @@ export default function Login() {
                   }}
                 />
                 <Form.SubmitBtn
-                  form="config-form"
+                  form="login-form"
                   gridProps={{
                     pl: '0 !important',
                     xs: 12,
@@ -108,12 +140,12 @@ export default function Login() {
               </Link>
             </Typography>
             <Typography sx={{ ...styles.footer, ...styles.recoveryPass }}>
-              Não tem uma conta?{' '}
+              Venhar ser um colaborador{' '}
               <Link
-                href="/signup"
+                href="/about"
                 style={{ color: theme.palette.primary.light }}
               >
-                Cadastre-se
+                ver mais
               </Link>
             </Typography>
           </CardContent>
@@ -200,3 +232,5 @@ const makeStyles = (theme: Theme) => ({
     },
   },
 })
+
+Login.displayName = 'Login'

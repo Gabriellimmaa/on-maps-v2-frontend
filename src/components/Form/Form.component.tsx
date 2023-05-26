@@ -11,6 +11,9 @@ import { FormTextInput } from './FormTextInput.component'
 import { FormFileInput } from './FormFileInput.component'
 import { FormCheckbox } from './FormCheckbox.component'
 import { FormSelectCheckboxInput } from './FormSelectCheckboxInput.component'
+import { FormTimePickerInput } from './FormTimePickerInput.component'
+import { FormDateTimePickerInput } from './FormDateTimePickerInput.component'
+import { FormTextEditorInput } from './FormTextEditorInput.component'
 
 type Props = Omit<
   GridTypeMap<React.FormHTMLAttributes<HTMLFormElement>>['props'],
@@ -52,3 +55,6 @@ Form.SwitchInput = FormSwitchInput
 Form.FileInput = FormFileInput
 Form.Checkbox = FormCheckbox
 Form.SelectCheckboxInput = FormSelectCheckboxInput
+Form.TimePicketInput = FormTimePickerInput
+Form.DateTimeInput = FormDateTimePickerInput
+Form.TextEditorInput = FormTextEditorInput

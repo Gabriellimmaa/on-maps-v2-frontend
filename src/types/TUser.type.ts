@@ -1,11 +1,10 @@
-import { TRole } from '@/types'
+import { TPermissions } from '@/types'
 
 export type TUser = {
   id: number
-  firstName: string
-  lastName: string
+  username: string
   email: string
-  role: TRole[]
+  permissions: TPermissions[]
   createdAt: string
   updatedAt: string
 }

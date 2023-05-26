@@ -6,10 +6,17 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import Logout from '@mui/icons-material/Logout'
 import { TMenuOpen } from '@/types'
 import { ModalSettings } from './ModalSettings/ModalSettings.component'
+import { useUser } from '@/context/user.context'
+import api from '@/clients/http/http.client'
 
 export const AccountMenu = ({ anchorEl, handleClose, open }: TMenuOpen) => {
+  const { setUser } = useUser()
   const handleLogout = () => {
-    // logout action
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('user')
+    setUser(undefined)
+    api.defaults.headers.authorization
+    window.location.href = '/'
   }
 
   const [openSettings, setOpenSettings] = useState(false)
