@@ -29,8 +29,8 @@ export default function App({ Component, pageProps }: AppProps) {
       return
     }
 
-    // const tempoExibicaoModal = 120000 // 2 minutos
-    const tempoExibicaoModal = 5000 // 5 segundos
+    const tempoExibicaoModal = 120000 // 2 minutos
+    // const tempoExibicaoModal = 5000 // 5 segundos
 
     const timeoutId = setTimeout(() => {
       setOpenFeedback(true)
@@ -91,11 +91,11 @@ function defaultProvider({
               <ThemeProvider theme={createCustomTheme()}>
                 <CssBaseline />
                 <ToastProvider>
-                  {React.createElement(layout, {}, children)}
                   <ModalFeedback
                     open={openFeedback ? openFeedback : false}
                     handleClose={() => setOpenFeedback(false)}
                   />
+                  {React.createElement(layout, {}, children)}
                 </ToastProvider>
               </ThemeProvider>
             ) : (
