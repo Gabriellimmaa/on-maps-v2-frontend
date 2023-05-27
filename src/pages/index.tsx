@@ -10,7 +10,9 @@ import { Box, Button, Link, Typography, useTheme } from '@mui/material'
 import { TCampus } from '@/types'
 import NearMeIcon from '@mui/icons-material/NearMe'
 import MapIcon from '@mui/icons-material/Map'
+import { useRouter } from 'next/router'
 export default function Home() {
+  const router = useRouter()
   const { palette } = useTheme()
   const formHandler = useForm<{
     universityId: number
@@ -149,10 +151,15 @@ export default function Home() {
             Venha contribuir com a plataforma
           </Button>
           <Button
-            component={Link}
-            href="/login"
-            width={1}
+            onClick={() => {
+              const authToken = localStorage.getItem('authToken')
+              if (authToken) {
+                router.push('/dashboard')
+              }
+              router.push('/login')
+            }}
             sx={{
+              width: 1,
               background: palette.success.main,
               '&:hover': {
                 background: palette.success.dark,

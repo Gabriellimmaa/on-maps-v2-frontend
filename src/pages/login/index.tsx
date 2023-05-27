@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import Link from 'next/link'
 import styleModule from '@/styles/Home.module.css'
@@ -26,9 +26,11 @@ import { useToast } from '@/hooks/useToast.hook'
 import { AxiosError } from 'axios'
 import { useUser } from '@/context/user.context'
 import PlaceIcon from '@mui/icons-material/Place'
+import { useRouter } from 'next/router'
 
 export default function Login() {
   const theme = useTheme()
+  const router = useRouter()
   const styles = makeStyles(theme)
   const items = Array(10).fill(null)
   const { createToast } = useToast()
@@ -61,6 +63,13 @@ export default function Login() {
       })
     } catch {}
   }
+
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken')
+    if (authToken) {
+      router.push('/dashboard')
+    }
+  }, [])
 
   const formHandler = useForm<TPostLoginUserBody>({
     mode: 'all',
