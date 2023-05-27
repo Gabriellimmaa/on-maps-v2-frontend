@@ -133,7 +133,7 @@ export const DashboardSideBar = () => {
     {
       title: 'Sobre',
       icon: <InfoIcon />,
-      path: 'about',
+      path: '/about',
       route: true,
       style: {
         position: 'absolute',
