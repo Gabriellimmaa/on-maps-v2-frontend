@@ -114,7 +114,7 @@ export const ModalCreateEquipment = (props: TProps) => {
                   <TableCell>Nome</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody sx={{ position: 'relative' }}>
                 {isLoading && (
                   <Box
                     sx={{

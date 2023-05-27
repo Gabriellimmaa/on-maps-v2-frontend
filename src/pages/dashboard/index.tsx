@@ -138,7 +138,7 @@ function Dashboard() {
                   ))}
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody sx={{ position: 'relative' }}>
                 {isLoadingUniversities && (
                   <Box
                     sx={{
@@ -252,7 +252,7 @@ function Dashboard() {
                   ))}
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody sx={{ position: 'relative' }}>
                 {isLoadingCampuses && (
                   <Box
                     sx={{

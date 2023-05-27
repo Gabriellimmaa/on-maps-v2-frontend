@@ -115,7 +115,7 @@ export const ModalCreateCategory = (props: TProps) => {
                   <TableCell>Nome</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody sx={{ position: 'relative' }}>
                 {isLoadingCategories && (
                   <Box
                     sx={{
