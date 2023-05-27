@@ -1,23 +1,102 @@
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import styles from './styles/MapSideBar.module.css'
 import { FaUser } from 'react-icons/fa'
 import { DataMapCategories, DataCampus, DataEvents } from '@/data'
 import Image from 'next/image'
-import ImageHeader from '@/assets/header.png'
+import ImageHeader from '@/assets/UenpLogo.png'
 import { IoClose } from 'react-icons/io5'
 import { useMapInfo } from '@/context/_useMapInfo.context'
+import {
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Slider,
+  Link,
+  Typography,
+  Divider,
+  IconButton,
+  Box,
+  Tooltip,
+} from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { getCampusById, getCategory, getEventFilter } from '@/api'
+import { LoadingSpinner } from '../Loading'
+import { getCampus } from '@/api'
+import { getUniversityFilter } from '@/api'
+import { useForm } from 'react-hook-form'
+import { Form } from '@/components/Form'
+import { TCampus } from '@/types'
+import CloseIcon from '@mui/icons-material/Close'
+import PersonIcon from '@mui/icons-material/Person'
+import { alignSpaceBetween, flexAlingCenter } from '@/utils/cssInJsBlocks'
 
 export function MapSideBar() {
-  const { position, setPosition, config, setConfig, viewMenu, setViewMenu } =
-    useMapInfo()
+  const {
+    position,
+    setPosition,
+    config,
+    setConfig,
+    viewMenu,
+    setViewMenu,
+    universityId,
+    campusId,
+  } = useMapInfo()
 
   const router = useRouter()
   const [latitudeUser, setLatitudeUser] = useState('')
   const [longitudeUser, setLongitudeUser] = useState('')
-  const [range, setRange] = useState('1')
+  const [range, setRange] = useState(1)
   const [inputCheck, setCheck] = useState(true)
+
+  const { data: events, isLoading: isLoadingEvents } = useQuery(
+    ['events'],
+    () => getEventFilter({})
+  )
+
+  const { data: universities, isLoading: isLoadingUniversities } = useQuery(
+    ['universities'],
+    () => getUniversityFilter(),
+    {
+      keepPreviousData: true,
+    }
+  )
+
+  const { data: campuses, isLoading: isLoadingCampuses } = useQuery(
+    ['campuses'],
+    () => getCampus(),
+    {
+      keepPreviousData: true,
+    }
+  )
+
+  // const { data: campus } = useQuery(['campus'], () => getCampusById(campusId))
+  // const { data: campus } = useQuery(['campus'], () => getUniversityFilter(campusId))
+
+  const { data: categories, isLoading: isLoadingCategories } = useQuery(
+    ['categories'],
+    () => getCategory(),
+    {
+      keepPreviousData: true,
+      onSuccess: (data) => {
+        return [
+          {
+            id: 0,
+            name: 'Todos',
+            description: 'Todos os eventos',
+          },
+          ...data,
+        ]
+      },
+    }
+  )
+
+  const formHandler = useForm<{
+    universityId: string
+    campusId: string
+  }>({})
 
   function getLocation() {
     if (navigator.geolocation) {
@@ -38,6 +117,14 @@ export function MapSideBar() {
     router.push(`/map/${latitudeUser}/${longitudeUser}`)
   }
 
+  if (
+    isLoadingCampuses ||
+    isLoadingCategories ||
+    isLoadingEvents ||
+    isLoadingUniversities
+  )
+    return <LoadingSpinner />
+
   return (
     <>
       <div
@@ -46,106 +133,212 @@ export function MapSideBar() {
         }
       >
         {/* header */}
-        <section className={`${styles.header} ${styles.tag}`}>
+        <Box sx={{ ...alignSpaceBetween, px: 2, py: 1 }}>
           <Link href="/">
-            <Image src={ImageHeader} alt="logo" className={styles.image} />
+            <Image src={ImageHeader} alt="logo" height={30} />
           </Link>
-          <IoClose
-            className={styles.icon}
-            size={20}
+          <IconButton
+            aria-label="delete"
+            size="large"
             onClick={() => {
               setViewMenu(false)
             }}
-          />
-        </section>
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Divider />
         {/* my location */}
         <section className={styles.tag}>
-          <div className={styles.title}>
-            <FaUser className={styles.icon} />
-            <b onClick={getLocation}>Sua Localização</b>
-          </div>
+          <Tooltip title={'Ver sua localização'} placement="right" arrow>
+            <Typography
+              variant="h5"
+              onClick={getLocation}
+              sx={{
+                ...flexAlingCenter,
+                mb: 0,
+                cursor: 'pointer',
+                userSelect: 'none',
+              }}
+            >
+              <PersonIcon />
+              Sua Localização
+            </Typography>
+          </Tooltip>
         </section>
+        {/* <Divider /> */}
         {/* campus */}
         <section className={styles.tag}>
-          <div className={styles.title}>
-            {/* <FaMapMarkerAlt className={styles.icon} /> */}
-            <b onClick={handleMyLocaltion}>Campus</b>
-          </div>
-          <ul>
-            {DataCampus.map((campus, _index) => (
-              <li key={_index}>
-                <label
-                  className={styles.radio}
-                  onClick={() => {
-                    setPosition({
-                      latitude: campus.lat,
-                      longitude: campus.lng,
-                    })
-                  }}
-                >
-                  <span>{campus.title}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
+          <Form
+            id="filter-places"
+            handler={formHandler}
+            onSubmit={async (data: any) => {
+              console.log(formHandler.getValues())
+              console.log('campusId' + campusId)
+              console.log('universityId' + universityId)
+            }}
+          >
+            <Form.SelectInput
+              id="universityId"
+              label="Universidade"
+              gridProps={{
+                xs: 12,
+                px: '0px !important',
+              }}
+              formControlProps={{
+                sx: { minWidth: 120, width: '100%' },
+              }}
+              defaultValue={universityId?.toString()}
+              values={
+                !universities
+                  ? []
+                  : universities.map((campus: any) => ({
+                      value: campus.id.toString(),
+                      label: campus.name,
+                    }))
+              }
+            />
+
+            <Form.SelectInput
+              id="campusId"
+              label="Campus"
+              gridProps={{
+                xs: 12,
+                px: '0px !important',
+              }}
+              formControlProps={{
+                sx: { minWidth: 120, width: '100%' },
+              }}
+              defaultValue={campusId?.toString()}
+              values={
+                !campuses
+                  ? []
+                  : campuses.map((campus: any) => ({
+                      value: campus.id.toString(),
+                      label: campus.name,
+                    }))
+              }
+            />
+            <Form.SubmitBtn
+              form="filter-places"
+              handler={formHandler}
+              gridProps={{
+                xs: 12,
+                px: '0px !important',
+              }}
+              btnProps={{
+                fullWidth: true,
+              }}
+            >
+              Filtrar
+            </Form.SubmitBtn>
+          </Form>
         </section>
+        <Divider />
         {/* events */}
         <section className={`${styles.events} ${styles.tag}`}>
-          <div className={styles.title}>
-            {/* <AiFillCalendar className={styles.icon} /> */}
-            <b>Eventos</b>
-          </div>
-          <ul>
-            {DataEvents.map((event, _index) => (
-              <li key={_index}>
-                <Link href={`/place/${event.id}`} className={styles.radio}>
-                  {event.title}
-                  <span>{event.date}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <Typography variant="h5" gutterBottom>
+            Eventos
+          </Typography>
+          {isLoadingEvents ? (
+            <LoadingSpinner />
+          ) : !events ? (
+            <Typography gutterBottom>Nenhum evento encontrado</Typography>
+          ) : (
+            events.map((event, _index) => {
+              return (
+                <Tooltip
+                  key={_index}
+                  title={'Ver evento'}
+                  placement="right"
+                  arrow
+                >
+                  <Link
+                    key={_index}
+                    href={`/event/${event.id}`}
+                    sx={{
+                      textDecoration: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      color: 'inherit',
+                    }}
+                  >
+                    <Typography variant="body2" gutterBottom>
+                      {event.name}
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      {new Date(event.date).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: '2-digit',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                      })}
+                    </Typography>
+                  </Link>
+                </Tooltip>
+              )
+            })
+          )}
         </section>
+        <Divider />
         {/* settings */}
         <section className={styles.tag}>
-          <div className={styles.title}>
-            {/* <FaCog className={styles.icon} /> */}
-            <b>Configurações</b>
-          </div>
-          <ul>
-            <li>
-              <label className={styles.range}>
-                <span>Tamanho icone:</span>
-                <input
-                  type="range"
-                  min="1"
-                  max="8"
-                  step="1"
-                  defaultValue={range}
-                  onChange={(e) => {
-                    setRange(e.target.value)
-                  }}
-                />
-              </label>
-            </li>
-            {DataMapCategories.map((category, _index) => (
-              <li key={_index}>
-                <label className={styles.radio}>
-                  <input
-                    type="radio"
-                    name="category"
-                    value={category.value}
-                    checked={config === category.value}
-                    onChange={(e) => {
-                      setConfig(e.target.value)
-                    }}
+          <Typography variant="h5" gutterBottom>
+            Configurações
+          </Typography>
+          <Box sx={flexAlingCenter}>
+            <Typography
+              variant="body2"
+              sx={{
+                whiteSpace: 'nowrap',
+                mr: 2,
+              }}
+            >
+              Tamanho icone:
+            </Typography>
+            <Slider
+              min={1}
+              max={8}
+              step={1}
+              defaultValue={1}
+              onChange={(e, newValue) => {
+                setRange(newValue as number)
+              }}
+            />
+          </Box>
+
+          <FormControl fullWidth>
+            <RadioGroup name="radio-buttons-group">
+              {isLoadingCategories ? (
+                <LoadingSpinner />
+              ) : !categories ? (
+                <Typography gutterBottom>
+                  Nenhuma categoria encontrada
+                </Typography>
+              ) : (
+                categories.map((category, _index) => (
+                  <FormControlLabel
+                    key={_index}
+                    value={category.id}
+                    control={
+                      <Radio
+                        sx={{
+                          py: 0.5,
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">{category.name}</Typography>
+                    }
                   />
-                  <span>{category.title}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
+                ))
+              )}
+            </RadioGroup>
+          </FormControl>
         </section>
+        <Divider />
         {/* <section className={styles.tag} id="infos">
           <ul>
             <li>

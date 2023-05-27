@@ -8,6 +8,7 @@ import {
   MenuItem,
   Select,
   SelectProps,
+  FormControlProps,
 } from '@mui/material'
 import { ReactNode } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
@@ -25,6 +26,7 @@ type Props = {
   }[]
   gridProps?: Omit<GridTypeMap['props'], 'item' | 'container'>
   selectProps?: Omit<SelectProps, 'label' | 'error'>
+  formControlProps?: FormControlProps
   inputLabelProps?: Omit<InputLabelProps, 'error'>
   defaultValue?: string
 }
@@ -44,12 +46,16 @@ export const FormSelectInput = (props: Props) => {
     gridProps,
     selectProps,
     inputLabelProps,
+    formControlProps,
     defaultValue = '',
   } = props
 
   return (
     <Grid sx={{ ...flexCenterContent }} {...gridProps} item>
-      <FormControl sx={{ minWidth: 120, height: '80px', width: '100%' }}>
+      <FormControl
+        sx={{ minWidth: 120, height: '80px', width: '100%' }}
+        {...formControlProps}
+      >
         <InputLabel
           {...inputLabelProps}
           error={!!_get(errors, `${id}.message`)}

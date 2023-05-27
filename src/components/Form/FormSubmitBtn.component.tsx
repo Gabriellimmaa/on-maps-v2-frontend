@@ -39,9 +39,9 @@ export const FormSubmitBtn = (props: Props) => {
         id={`${form}-submit-btn`}
         type="submit"
         size="large"
-        {...btnProps}
         disabled={isSubmitting}
         form={form}
+        {...btnProps}
       >
         {isLoading ? loading : children}
       </Button>

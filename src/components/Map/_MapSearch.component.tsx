@@ -1,48 +1,50 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './styles/MapSearch.module.css'
 import { MapCardSearch } from './_MapCardSearch.component'
 import { AiOutlineMenu } from 'react-icons/ai'
 import { BsFillGridFill } from 'react-icons/bs'
 import { TbListDetails } from 'react-icons/tb'
 import { useMapInfo } from '@/context/_useMapInfo.context'
-
-const rooms = [
-  {
-    id: 1,
-    name: 'Sala 1',
-    description: 'Sala de aula',
-    piso: 1,
-    category: 'sala',
-    link: 'https://cdn.discordapp.com/attachments/771470980324524043/1001706440601370766/preview1.png',
-    latitude: -23.108,
-    longitude: -50.3594239,
-  },
-  {
-    id: 2,
-    name: 'Sala 2',
-    description: 'Sala de aula',
-    piso: 1,
-    category: 'sala',
-    link: 'https://cdn.discordapp.com/attachments/771470980324524043/1074461555904745524/f53137d8-2472-434b-8ab0-385a611f0c8d.JPG',
-    latitude: -23.108,
-    longitude: -50.3594239,
-  },
-  {
-    id: 3,
-    name: 'Sala 3',
-    description: 'Sala de aula',
-    piso: 2,
-    category: 'sala',
-    link: 'https://cdn.discordapp.com/attachments/1087523573289189476/1087888499216224397/image.png',
-    latitude: -23.108,
-    longitude: -50.3594239,
-  },
-]
+import { useDebounce } from '@/hooks'
+import { useForm } from 'react-hook-form'
+import { Form } from '@/components/Form'
+import { TGetPlaceFilterQueryParams } from '@/types'
+import { useQuery } from '@tanstack/react-query'
+import { getPlaceFilter } from '@/api'
+import { queryClient } from '@/clients'
 
 export function MapSearch() {
   const { viewMenu, setViewMenu } = useMapInfo()
-  const [search, setSearch] = useState('')
+  const [name, setName] = useState('')
   const [typeCard, setTypeCard] = useState<'grid' | 'list'>('list')
+  const [params, setParams] = useState<TGetPlaceFilterQueryParams>({})
+
+  const formHandler = useForm<any>({
+    shouldUnregister: false,
+  })
+
+  const debouncedSearch = useDebounce(name, 500)
+
+  const {
+    data: places,
+    isFetching: isLoadingPlaces,
+    isInitialLoading,
+  } = useQuery(['places', params], () => getPlaceFilter(params), {
+    enabled: !!debouncedSearch,
+    keepPreviousData: true,
+  })
+
+  useEffect(() => {
+    if (!!debouncedSearch) {
+      setParams({
+        placeName: debouncedSearch,
+      })
+      return
+    }
+
+    return
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch])
 
   return (
     <div
@@ -52,7 +54,9 @@ export function MapSearch() {
     >
       <div
         className={
-          rooms.length > 0
+          !places
+            ? styles.search
+            : places?.length > 0
             ? `${styles.search} ${styles.activecard}`
             : styles.search
         }
@@ -66,7 +70,7 @@ export function MapSearch() {
         />
         <input
           className={styles.input}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           placeholder="Pesquise por um local"
           id="input-text"
           type="text"
@@ -87,12 +91,15 @@ export function MapSearch() {
         id="card"
         style={{
           marginLeft: 10,
-          width: 'calc(100% + 2px)',
+          width: '100%',
         }}
       >
-        {rooms.map((room) => {
-          return <MapCardSearch type={typeCard} room={room} key={room.id} />
-        })}
+        {debouncedSearch !== '' &&
+          places?.map((place) => {
+            return (
+              <MapCardSearch type={typeCard} place={place} key={place.id} />
+            )
+          })}
       </div>
     </div>
   )

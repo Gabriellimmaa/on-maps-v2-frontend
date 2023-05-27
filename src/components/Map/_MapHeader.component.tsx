@@ -10,6 +10,8 @@ import {
 import styles from './styles/MapHeader.module.css'
 import { MdKeyboardArrowRight, MdKeyboardArrowLeft } from 'react-icons/md'
 import { useMapInfo } from '@/context/_useMapInfo.context'
+import { getCategory } from '@/api'
+import { useQuery } from '@tanstack/react-query'
 
 export function MapHeader() {
   const { config, setConfig, viewMenu, setViewMenu } = useMapInfo()
@@ -17,6 +19,24 @@ export function MapHeader() {
   const elementRef = useRef<HTMLDivElement | null>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const { data: categories, isLoading: isLoadingCategories } = useQuery(
+    ['categories'],
+    () => getCategory(),
+    {
+      keepPreviousData: true,
+      onSuccess: (data) => {
+        return [
+          {
+            id: 0,
+            name: 'Todos',
+            description: 'Todos os eventos',
+          },
+          ...data,
+        ]
+      },
+    }
+  )
 
   function handleScrollLeft() {
     if (!elementRef.current) return
@@ -66,7 +86,7 @@ export function MapHeader() {
       >
         <MdKeyboardArrowLeft size={25} color="black" />
       </label>
-      {DataMapCategories.map((category, _index) => (
+      {/* {DataMapCategories.map((category, _index) => (
         <label
           className={
             config === category.value
@@ -84,7 +104,27 @@ export function MapHeader() {
           })}
           <span>{category.title}</span>
         </label>
-      ))}
+      ))} */}
+      {!isLoadingCategories &&
+        categories?.map((category, _index) => (
+          <label
+            className={
+              config === category.id.toString()
+                ? `${styles.item} ${styles.active}`
+                : styles.item
+            }
+            key={_index}
+            onClick={() => {
+              setConfig(category.id.toString())
+            }}
+          >
+            {/* {createElement(category.icon, {
+              size: 12,
+              color: 'black',
+            })} */}
+            <span>{category.name}</span>
+          </label>
+        ))}
       <label
         className={styles.button_right}
         style={{

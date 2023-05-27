@@ -157,44 +157,43 @@ export const DashboardSideBar = () => {
                 user?.permissions.includes(item.permission as TPermissions)
               ) {
                 return (
-                  <>
-                    <ListItem
-                      disablePadding
-                      key={index}
-                      sx={item.style ? item.style : {}}
+                  <ListItem
+                    disablePadding
+                    key={index}
+                    sx={item.style ? item.style : {}}
+                  >
+                    <Tooltip
+                      title={item.title}
+                      placement="right-start"
+                      TransitionComponent={Zoom}
                     >
-                      <Tooltip
-                        title={item.title}
-                        placement="right-start"
-                        TransitionComponent={Zoom}
-                      >
-                        {item.route ? (
-                          <Link
-                            href={`${item.path}`}
-                            style={{
-                              width: '100%',
-                            }}
-                          >
-                            <ListItemButton
-                              selected={
-                                currentRoute === `${item.path}` ? true : false
-                              }
-                            >
-                              <ListItemIcon>{item.icon}</ListItemIcon>
-                            </ListItemButton>
-                          </Link>
-                        ) : (
+                      {item.route ? (
+                        <Link
+                          href={`${item.path}`}
+                          style={{
+                            width: '100%',
+                          }}
+                        >
                           <ListItemButton
-                            onClick={(event) =>
-                              setAnchorEl(event.currentTarget)
+                            selected={
+                              currentRoute === `${item.path}` && !anchorEl
+                                ? true
+                                : false
                             }
                           >
                             <ListItemIcon>{item.icon}</ListItemIcon>
                           </ListItemButton>
-                        )}
-                      </Tooltip>
-                    </ListItem>
-                  </>
+                        </Link>
+                      ) : (
+                        <ListItemButton
+                          onClick={(event) => setAnchorEl(event.currentTarget)}
+                          selected={anchorEl ? true : false}
+                        >
+                          <ListItemIcon>{item.icon}</ListItemIcon>
+                        </ListItemButton>
+                      )}
+                    </Tooltip>
+                  </ListItem>
                 )
               }
             })}

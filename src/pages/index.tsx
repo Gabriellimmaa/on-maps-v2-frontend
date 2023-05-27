@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { Form } from '@/components/Form'
 import { LoadingSpinner } from '@/components'
 import { Box, Button, Link, Typography, useTheme } from '@mui/material'
-import { TCampus } from '@/types'
+import { TCampus, TUniversity } from '@/types'
 import NearMeIcon from '@mui/icons-material/NearMe'
 import MapIcon from '@mui/icons-material/Map'
 import { useRouter } from 'next/router'
@@ -15,31 +15,35 @@ export default function Home() {
   const router = useRouter()
   const { palette } = useTheme()
   const formHandler = useForm<{
-    universityId: number
-    campus: TCampus
+    university: TUniversity
+    campusId: number
   }>({
     shouldUnregister: true,
   })
 
-  const watchUniversityId = formHandler.watch('universityId')
-  const watchCampusId = formHandler.watch('campus')
+  const watchUniversity = formHandler.watch('university')
+  const watchCampusId = formHandler.watch('campusId')
 
   const { data: universities, isLoading: isLoadingUniversities } = useQuery(
     ['universities'],
-    () => getUniversityFilter()
-  )
-
-  const { data: campuses, isLoading: isLoadingCampuses } = useQuery(
-    ['campus'],
-    () => getCampus(),
+    () => getUniversityFilter(),
     {
-      enabled: !!watchUniversityId,
+      keepPreviousData: true,
     }
   )
 
-  if (isLoadingUniversities) return <LoadingSpinner />
+  const latitude = watchUniversity
+    ? watchUniversity.campuses.find(
+        (campus) => campus.id.toString() === watchCampusId.toString()
+      )?.position[0].latitude
+    : undefined
+  const longitude = watchUniversity
+    ? watchUniversity.campuses.find(
+        (campus) => campus.id.toString() === watchCampusId.toString()
+      )?.position[0].longitude
+    : undefined
 
-  console.log(watchCampusId)
+  if (isLoadingUniversities) return <LoadingSpinner />
 
   return (
     <div className={styles.formContainer}>
@@ -62,7 +66,7 @@ export default function Home() {
             }}
           >
             <Form.SelectInput
-              id="universityId"
+              id="university"
               label="Selecione uma Universidade"
               gridProps={{
                 xs: 8,
@@ -70,29 +74,32 @@ export default function Home() {
               values={
                 !universities
                   ? []
-                  : universities.map((campus: any) => ({
-                      value: campus.id,
-                      label: campus.name,
+                  : universities.map((university: any) => ({
+                      value: university,
+                      label: university.name,
                     }))
               }
+              selectProps={{
+                value: watchUniversity ? watchUniversity : '',
+              }}
             />
             <Form.SelectInput
-              id="campus"
+              id="campusId"
               label="Campus"
               gridProps={{
                 xs: 4,
               }}
               values={
-                !campuses
+                !watchUniversity
                   ? []
-                  : campuses.map((campus: any) => ({
-                      value: campus,
-                      label: campus.name,
+                  : watchUniversity.campuses.map((row: any) => ({
+                      value: row.id.toString(),
+                      label: row.name,
                     }))
               }
               selectProps={{
-                disabled: !watchUniversityId,
-                value: watchCampusId ? watchCampusId.name : undefined,
+                disabled: !watchUniversity,
+                value: watchCampusId ? watchCampusId : '',
               }}
             />
           </Form>
@@ -100,9 +107,7 @@ export default function Home() {
             <>
               <Button
                 component={Link}
-                href={`/map/${watchCampusId.position[0].latitude as any}/${
-                  watchCampusId.position[0].longitude
-                }`}
+                href={`/map/${watchUniversity.id}/${watchCampusId}/${latitude}/${longitude}`}
                 width={1}
                 startIcon={<NearMeIcon />}
               >

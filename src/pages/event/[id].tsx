@@ -1,14 +1,11 @@
 import { Divider, Box, Grid, Typography, Button, Link } from '@mui/material'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { createElement } from 'react'
-import { DataEquipaments, DataMapCategories } from '@/data'
 import Carousel from 'react-material-ui-carousel'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore'
-import dynamic from 'next/dynamic'
 import { useMapInfo } from '../../context/_useMapInfo.context'
-import { getEventById, getPlaceById, getPlaceFilter } from '@/api'
+import { getEventById } from '@/api'
 import { LoadingSpinner } from '@/components'
 import { useQuery } from '@tanstack/react-query'
 import InstagramIcon from '@mui/icons-material/Instagram'
@@ -17,24 +14,9 @@ import LanguageIcon from '@mui/icons-material/Language'
 import { flexAlingCenter } from '@/utils/cssInJsBlocks'
 import { phoneRegexMask } from '@/utils/regexMasks'
 
-const MapComponent = dynamic(() => import('@/components/Map/Map.component'), {
-  loading: () => <p>loading...</p>,
-  ssr: false,
-})
-
-const MarkerComponent = dynamic(
-  () => import('@/components/Map/Marker.component'),
-  {
-    loading: () => <p>loading...</p>,
-    ssr: false,
-  }
-)
-
 export default function EventId() {
   const router = useRouter()
   const { id } = router.query
-
-  const { zoomIcon, anchorIcon, popAnchor } = useMapInfo()
 
   const { data, isLoading } = useQuery(
     ['place', id],

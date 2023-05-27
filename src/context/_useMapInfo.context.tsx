@@ -1,3 +1,4 @@
+import { TCampus } from '@/types'
 import React, { createContext, useContext, useState } from 'react'
 
 type MapInfoContextType = {
@@ -16,6 +17,10 @@ type MapInfoContextType = {
   setAnchor: (value: number) => void
   popAnchor: number
   setPopAnchor: (value: number) => void
+  universityId: number | null
+  setUniversityId: (value: any) => void
+  campusId: number | null
+  setCampusId: (value: any) => void
 }
 
 const MapInfoContext = createContext<MapInfoContextType>({
@@ -34,6 +39,10 @@ const MapInfoContext = createContext<MapInfoContextType>({
   setAnchor: () => {},
   popAnchor: -60,
   setPopAnchor: () => {},
+  universityId: null,
+  setUniversityId: () => {},
+  campusId: null,
+  setCampusId: () => {},
 })
 
 const MapInfoProvider: React.FC<{
@@ -51,6 +60,8 @@ const MapInfoProvider: React.FC<{
   const [zoomIcon, setScale] = useState(48)
   const [anchorIcon, setAnchor] = useState(23)
   const [popAnchor, setPopAnchor] = useState(-60)
+  const [universityId, setUniversityId] = useState(null)
+  const [campusId, setCampusId] = useState(null)
 
   return (
     <MapInfoContext.Provider
@@ -67,6 +78,10 @@ const MapInfoProvider: React.FC<{
         setAnchor,
         popAnchor,
         setPopAnchor,
+        universityId,
+        setUniversityId,
+        campusId,
+        setCampusId,
       }}
     >
       {children}
