@@ -39,7 +39,9 @@ export const createThemeComponents = (): Components<Theme> => {
     MuiTableHead: {
       styleOverrides: {
         root: {
-          backgroundColor: '#E5E7EB',
+          '& .MuiTableCell-root': {
+            backgroundColor: '#E5E7EB',
+          },
         },
       },
     },

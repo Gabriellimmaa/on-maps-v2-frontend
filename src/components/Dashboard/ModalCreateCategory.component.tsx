@@ -107,77 +107,79 @@ export const ModalCreateCategory = (props: TProps) => {
               Criar
             </Form.SubmitBtn>
           </Form>
-          <TableContainer component={Paper} sx={{ maxHeight: '400px' }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Ações</TableCell>
-                  <TableCell>Nome</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody sx={{ position: 'relative' }}>
-                {isLoadingCategories && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      position: 'absolute',
-                      backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                      width: '100%',
-                      height: '100%',
-                    }}
-                  >
-                    <LoadingSpinner
-                      boxProps={{
-                        position: 'absolute',
-                        margin: 'auto',
-                      }}
-                    />
-                  </Box>
-                )}
-                {!categories || categories.length === 0 ? (
+          <Box sx={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <TableContainer component={Paper}>
+              <Table stickyHeader>
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={12}>
-                      <Typography variant="h5" my={5} textAlign={'center'}>
-                        Nenhum lugar encontrado.
-                      </Typography>
-                    </TableCell>
+                    <TableCell>Ações</TableCell>
+                    <TableCell>Nome</TableCell>
                   </TableRow>
-                ) : (
-                  categories.map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell>
-                        <Tooltip title="Editar">
-                          <EditIcon
-                            onClick={() => {
-                              setData(row)
-                              setOpenEdit(true)
-                            }}
-                            sx={{ cursor: 'pointer', mr: 1 }}
-                            color="primary"
-                          />
-                        </Tooltip>
-                        <Tooltip title="Deletar">
-                          <DeleteIcon
-                            onClick={() => {
-                              setData(row)
-                              setOpenDelete(true)
-                            }}
-                            sx={{ cursor: 'pointer', ml: 1 }}
-                            color="error"
-                          />
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body1">{row.name}</Typography>
+                </TableHead>
+                <TableBody sx={{ position: 'relative' }}>
+                  {isLoadingCategories && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        position: 'absolute',
+                        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    >
+                      <LoadingSpinner
+                        boxProps={{
+                          position: 'absolute',
+                          margin: 'auto',
+                        }}
+                      />
+                    </Box>
+                  )}
+                  {!categories || categories.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={12}>
+                        <Typography variant="h5" my={5} textAlign={'center'}>
+                          Nenhum lugar encontrado.
+                        </Typography>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  ) : (
+                    categories.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell>
+                          <Tooltip title="Editar">
+                            <EditIcon
+                              onClick={() => {
+                                setData(row)
+                                setOpenEdit(true)
+                              }}
+                              sx={{ cursor: 'pointer', mr: 1 }}
+                              color="primary"
+                            />
+                          </Tooltip>
+                          <Tooltip title="Deletar">
+                            <DeleteIcon
+                              onClick={() => {
+                                setData(row)
+                                setOpenDelete(true)
+                              }}
+                              sx={{ cursor: 'pointer', ml: 1 }}
+                              color="error"
+                            />
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body1">{row.name}</Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
         </DialogContent>
       </Dialog>
       <ModalDelete

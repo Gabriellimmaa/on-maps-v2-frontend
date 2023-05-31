@@ -70,7 +70,7 @@ export default function ManageUser() {
           console.log(data)
         }}
       >
-        <Grid xs={6}>
+        <Grid item xs={6}>
           <Typography variant="h4" sx={{ mb: 2 }}>
             Gerenciar Usuários
           </Typography>
@@ -140,7 +140,7 @@ export default function ManageUser() {
             )}
             {users?.map((row: TUser) => (
               <TableRow key={row.id} sx={styles.tableRow}>
-                <TableCell>
+                <TableCell sx={{ minWidth: 90 }}>
                   <Tooltip title="Editar">
                     <EditIcon
                       onClick={() => {

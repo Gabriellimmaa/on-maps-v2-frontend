@@ -56,10 +56,16 @@ export default function ManageEvent() {
   )
 
   useEffect(() => {
-    setParams({
-      name: debouncedSearch,
-    })
-  }, [debouncedSearch])
+    if (debouncedSearch) {
+      if (watchName === '') {
+        setParams({})
+        return
+      }
+      setParams({
+        name: debouncedSearch,
+      })
+    }
+  }, [debouncedSearch, watchName])
 
   return (
     <>
@@ -70,12 +76,12 @@ export default function ManageEvent() {
           console.log(data)
         }}
       >
-        <Grid xs={7}>
+        <Grid item xs={7}>
           <Typography variant="h4" sx={{ mb: 2 }}>
             Gerenciar Eventos
           </Typography>
         </Grid>
-        <Grid xs={2}>
+        <Grid item xs={2}>
           <Button
             component={Link}
             href="/dashboard/create/event"
