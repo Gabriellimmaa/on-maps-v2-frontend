@@ -4,7 +4,7 @@ import { TMapCategories, TPlace } from '@/types'
 import { Icon } from 'leaflet'
 import { DataMapCategories } from '@/data'
 import styles from './styles/Marker.module.css'
-
+import iconMarker from '@/assets/Markers/01.png'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination, Navigation, Autoplay } from 'swiper'
 import 'swiper/css'
@@ -35,7 +35,7 @@ export default function Marker({
   )?.markerIcon
 
   const icon = new Icon({
-    iconUrl: iconByCategory?.src,
+    iconUrl: iconByCategory?.src ? iconByCategory?.src : iconMarker.src,
     iconSize: [zoomIcon, zoomIcon],
     iconAnchor: [anchorIcon, zoomIcon],
     popupAnchor: [0, popAnchor],
