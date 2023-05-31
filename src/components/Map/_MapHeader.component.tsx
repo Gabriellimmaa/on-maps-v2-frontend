@@ -109,13 +109,13 @@ export function MapHeader() {
         categories?.map((category, _index) => (
           <label
             className={
-              config === category.id.toString()
+              config === category.name
                 ? `${styles.item} ${styles.active}`
                 : styles.item
             }
             key={_index}
             onClick={() => {
-              setConfig(category.id.toString())
+              setConfig(category.name)
             }}
           >
             {/* {createElement(category.icon, {

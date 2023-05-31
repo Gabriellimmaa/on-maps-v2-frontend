@@ -1,12 +1,13 @@
 'use-client'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { LoadingSpinner, MapHeader, MapSearch, MapSideBar } from '@/components'
 import { useMapInfo } from '@/context/_useMapInfo.context'
 import 'leaflet/dist/leaflet.css'
 import { useQuery } from '@tanstack/react-query'
 import { getPlaceFilter } from '@/api'
+import { TGetPlaceFilterQueryParams } from '@/types'
 
 const MapComponent = dynamic(() => import('@/components/Map/Map.component'), {
   loading: () => <p>loading...</p>,
@@ -33,7 +34,11 @@ export default function Map() {
     setUniversityId,
     setCampusId,
     campusId,
+    config,
   } = useMapInfo()
+  const [filter, setFilter] = useState<TGetPlaceFilterQueryParams>({
+    campusId: campusId,
+  })
 
   useEffect(() => {
     if (params) {
@@ -58,15 +63,21 @@ export default function Map() {
   }, [params])
 
   const { data: places, isLoading: isLoadingPlaces } = useQuery(
-    ['places', params],
-    () =>
-      getPlaceFilter({
-        campusId: campusId,
-      }),
+    ['places', params, filter],
+    () => getPlaceFilter(filter),
     {
       enabled: !!campusId,
+      keepPreviousData: true,
     }
   )
+
+  useEffect(() => {
+    console.log(config)
+    setFilter((prev) => ({
+      ...prev,
+      category: config,
+    }))
+  }, [config])
 
   return (
     <div

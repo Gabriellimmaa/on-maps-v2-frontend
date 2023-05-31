@@ -43,6 +43,9 @@ export function MapSideBar() {
     setViewMenu,
     universityId,
     campusId,
+    setAnchor,
+    setScale,
+    setPopAnchor,
   } = useMapInfo()
 
   const router = useRouter()
@@ -115,6 +118,54 @@ export function MapSideBar() {
 
   function handleMyLocaltion() {
     router.push(`/map/${latitudeUser}/${longitudeUser}`)
+  }
+
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setConfig(value)
+  }
+
+  function handleRange(value: number) {
+    if (value === 1) {
+      setAnchor(7)
+      setScale(16)
+      setPopAnchor(-20)
+    }
+    if (value === 2) {
+      setAnchor(10)
+      setScale(23)
+      setPopAnchor(-30)
+    }
+    if (value === 3) {
+      setAnchor(11)
+      setScale(25)
+      setPopAnchor(-35)
+    }
+    if (value === 4) {
+      setAnchor(13)
+      setScale(28)
+      setPopAnchor(-40)
+    }
+    if (value === 5) {
+      setAnchor(14)
+      setScale(30)
+      setPopAnchor(-45)
+    }
+    if (value === 6) {
+      setAnchor(16)
+      setScale(34)
+      setPopAnchor(-50)
+    }
+    if (value === 7) {
+      setAnchor(20)
+      setScale(42)
+      setPopAnchor(-55)
+    }
+    if (value === 8) {
+      setAnchor(23)
+      setScale(48)
+      setPopAnchor(-60)
+    }
   }
 
   if (
@@ -304,7 +355,7 @@ export function MapSideBar() {
               step={1}
               defaultValue={1}
               onChange={(e, newValue) => {
-                setRange(newValue as number)
+                handleRange(newValue as number)
               }}
             />
           </Box>
@@ -321,12 +372,14 @@ export function MapSideBar() {
                 categories.map((category, _index) => (
                   <FormControlLabel
                     key={_index}
-                    value={category.id}
+                    value={category.name}
                     control={
                       <Radio
                         sx={{
                           py: 0.5,
                         }}
+                        onChange={handleRadioChange}
+                        checked={category.name === config}
                       />
                     }
                     label={

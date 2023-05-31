@@ -65,7 +65,7 @@ export function MapCardSearch({ place, type = 'list', ...rest }: TProps) {
             </div>
             <div className={styles.image}>
               <Image
-                src={place.image[0].url}
+                src={place.image[0]?.url}
                 alt="logo"
                 height={80}
                 width={60}

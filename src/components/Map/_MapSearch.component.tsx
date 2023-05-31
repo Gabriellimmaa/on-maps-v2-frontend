@@ -92,6 +92,8 @@ export function MapSearch() {
         style={{
           marginLeft: 10,
           width: '100%',
+          maxHeight: 'calc(100vh - 100px)',
+          overflowY: 'auto',
         }}
       >
         {debouncedSearch !== '' &&
