@@ -249,7 +249,7 @@ export default function ManagePlace() {
                     </TableCell>
 
                     <TableCell>
-                      <Tooltip title="Ver Evento" placement="left">
+                      <Tooltip title="Ver Ambiente" placement="left">
                         <Link href={`/place/${place.id}`}>
                           <LaunchIcon sx={{ cursor: 'pointer' }} />
                         </Link>
