@@ -105,18 +105,20 @@ export function PlaceCardSearch({ place }: TProps) {
               </Grid>
             </Grid>
           </CardContent>
-          <CardMedia
-            component="img"
-            sx={{
-              width: 151,
-              display: {
-                xs: 'none',
-                md: 'block',
-              },
-            }}
-            image={place.image[0].url}
-            alt={place.name}
-          />
+          {place.image[0]?.url && (
+            <CardMedia
+              component="img"
+              sx={{
+                width: 151,
+                display: {
+                  xs: 'none',
+                  md: 'block',
+                },
+              }}
+              image={place.image[0].url}
+              alt={place.name}
+            />
+          )}
         </Card>
       </Link>
     </>

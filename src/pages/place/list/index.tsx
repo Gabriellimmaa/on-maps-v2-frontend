@@ -23,6 +23,7 @@ import {
   TEquipment,
   TGetPlaceFilterQueryParams,
   TPlace,
+  TUniversity,
 } from '@/types'
 import {
   getCampus,
@@ -46,8 +47,8 @@ export default function PlaceList() {
   const formHandler = useForm<{
     name: string
     category: string
-    universityId: number
-    campus: number
+    university: TUniversity
+    campus: string
     equipments: TEquipment[]
   }>({
     shouldUnregister: false,
@@ -55,19 +56,17 @@ export default function PlaceList() {
 
   const watchName = formHandler.watch('name')
   const watchCategory = formHandler.watch('category')
-  const watchUniversityId = formHandler.watch('universityId')
+  const watchUniversity = formHandler.watch('university')
   const watchCampus = formHandler.watch('campus')
   const watchEquipment = formHandler.watch('equipments')
   const debouncedSearch = useDebounce(watchName, 500)
 
-  const { data: campuses, isFetching: isLoadingCampus } = useQuery(
-    ['campus'],
-    () => getCampus()
-  )
-
   const { data: universities, isLoading: isLoadingUniversities } = useQuery(
     ['universities'],
-    () => getUniversityFilter()
+    () => getUniversityFilter(),
+    {
+      keepPreviousData: true,
+    }
   )
 
   const { data: categories, isLoading: isLoadingCategories } = useQuery(
@@ -83,6 +82,7 @@ export default function PlaceList() {
 
         return modifiedData
       },
+      keepPreviousData: true,
     }
   )
 
@@ -101,6 +101,10 @@ export default function PlaceList() {
     () => getPlaceFilter(params),
     {
       enabled: !!watchCampus,
+      keepPreviousData: true,
+      onSuccess: (data) => {
+        return data
+      },
     }
   )
 
@@ -108,11 +112,10 @@ export default function PlaceList() {
     formHandler.reset({
       name: '',
       category: '',
-      universityId: undefined,
-      campus: undefined,
+      university: undefined,
+      campus: '',
       equipments: undefined,
     })
-    queryClient.removeQueries(['search-places'])
   }
 
   useEffect(() => {
@@ -157,7 +160,7 @@ export default function PlaceList() {
               </Tooltip>
             </Box>
             <Form.SelectInput
-              id="universityId"
+              id="university"
               label="Selecione uma Universidade"
               gridProps={{
                 xs: 12,
@@ -165,11 +168,14 @@ export default function PlaceList() {
               values={
                 !universities
                   ? []
-                  : universities.map((campus: any) => ({
-                      value: campus.id,
-                      label: campus.name,
+                  : universities.map((row: any) => ({
+                      value: row,
+                      label: row.name,
                     }))
               }
+              selectProps={{
+                value: watchUniversity ? watchUniversity : undefined,
+              }}
             />
             <Form.SelectInput
               id="campus"
@@ -178,18 +184,17 @@ export default function PlaceList() {
                 xs: 12,
               }}
               values={
-                !campuses
+                !watchUniversity
                   ? []
-                  : campuses.map((campus: any) => ({
+                  : watchUniversity.campuses.map((campus: any) => ({
                       value: campus.id,
                       label: campus.name,
                     }))
               }
-              selectProps={
-                {
-                  // disabled: !watchUniversityId,
-                }
-              }
+              selectProps={{
+                value: watchCampus ? watchCampus : undefined,
+                disabled: !watchUniversity,
+              }}
             />
             {watchCampus && (
               <>
@@ -240,7 +245,7 @@ export default function PlaceList() {
             <Form.TextInput
               id="name"
               label={
-                !watchUniversityId
+                !watchUniversity
                   ? 'Selecione uma universidade'
                   : !watchCampus
                   ? 'Selecione um campus'
@@ -257,9 +262,9 @@ export default function PlaceList() {
               disabled={!watchCampus}
             />
             <Box sx={styles.containerList}>
-              {isLoadingCampus || isFetchingPlaces ? (
+              {isFetchingPlaces ? (
                 <LoadingSpinner />
-              ) : places === undefined ? (
+              ) : places === undefined || watchCampus === '' ? (
                 <Typography variant="h6" sx={{ textAlign: 'center' }}>
                   <Image
                     src="/search-animate.svg"
