@@ -287,6 +287,7 @@ const styles = {
     display: 'flex',
     mt: 2,
     gap: 2,
+    flexWrap: 'wrap',
   },
   imageContainer: {
     // display: 'flex',
