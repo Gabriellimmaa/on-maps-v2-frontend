@@ -143,8 +143,6 @@ export const DashboardSideBar = () => {
     },
   ]
 
-  console.log(currentRoute)
-
   return (
     <>
       <Drawer variant="permanent" sx={styles.drawer}>

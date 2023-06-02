@@ -17,32 +17,32 @@ const UserProvider: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
   const [user, setUser] = useState<TUser | undefined>(
-    typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('user') || '{}') || undefined
+    typeof window !== 'undefined' && localStorage.getItem('user')
+      ? JSON.parse(localStorage.getItem('user') || '{}')
       : undefined
   )
 
-  const { data, isLoading } = useQuery(
-    ['user', user?.id],
-    () => {
-      if (user) {
-        return getUser(user.id)
-      }
-    },
-    {
-      enabled: user ? true : false,
-      onSuccess: (data) => {
-        localStorage.setItem('user', JSON.stringify(data))
-        setUser(data)
-      },
-      keepPreviousData: true,
-    }
-  )
+  // const { data, isLoading } = useQuery(
+  //   ['user', user?.id],
+  //   () => {
+  //     if (user) {
+  //       return getUser(user.id)
+  //     }
+  //   },
+  //   {
+  //     enabled: user ? true : false,
+  //     onSuccess: (data) => {
+  //       localStorage.setItem('user', JSON.stringify(data))
+  //       setUser(data)
+  //     },
+  //     keepPreviousData: true,
+  //   }
+  // )
 
   return (
     <UserContext.Provider
       value={{
-        user: data,
+        user: user,
         setUser,
       }}
     >

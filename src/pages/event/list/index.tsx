@@ -157,7 +157,7 @@ export default function EventList() {
           console.log(data)
         }}
       >
-        <Grid xs={8}>
+        <Grid item xs={8}>
           <Typography variant="h4" sx={{ alignSelf: 'baseline' }}>
             Todos eventos
           </Typography>

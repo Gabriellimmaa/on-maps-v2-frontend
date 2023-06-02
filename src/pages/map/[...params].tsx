@@ -72,7 +72,6 @@ export default function Map() {
   )
 
   useEffect(() => {
-    console.log(config)
     setFilter((prev) => ({
       ...prev,
       category: config,

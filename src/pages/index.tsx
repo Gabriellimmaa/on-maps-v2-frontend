@@ -11,9 +11,11 @@ import { TCampus, TUniversity } from '@/types'
 import NearMeIcon from '@mui/icons-material/NearMe'
 import MapIcon from '@mui/icons-material/Map'
 import { useRouter } from 'next/router'
+import { useUser } from '@/context/user.context'
 export default function Home() {
   const router = useRouter()
   const { palette } = useTheme()
+  const { user } = useUser()
   const formHandler = useForm<{
     university: TUniversity
     campusId: number
@@ -90,7 +92,7 @@ export default function Home() {
                 xs: 4,
               }}
               values={
-                !'  '
+                !watchUniversity
                   ? []
                   : watchUniversity.campuses.map((row: any) => ({
                       value: row.id.toString(),
@@ -171,7 +173,7 @@ export default function Home() {
               },
             }}
           >
-            Entrar como colaborador
+            {user ? 'Entrar na dashboard' : 'Entrar como colaborador'}
           </Button>
         </div>
 

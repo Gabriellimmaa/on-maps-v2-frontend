@@ -34,7 +34,6 @@ export const FormTimePickerInput = (props: TProps) => {
   const handleChange = (value: any) => {
     if (!value) return ''
     const date = new Date(value).toISOString()
-    console.log(date)
     return date
   }
 
