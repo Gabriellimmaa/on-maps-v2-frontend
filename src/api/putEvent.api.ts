@@ -5,7 +5,7 @@ export const putEvent = async (
   id: number,
   body: Partial<TPostCreateEventBody>
 ): Promise<TEvent> => {
-  const { data } = await httpClient.put<TEvent>(`/api/user/update/${id}`, body)
+  const { data } = await httpClient.put<TEvent>(`/api/event/update/${id}`, body)
 
   return data
 }

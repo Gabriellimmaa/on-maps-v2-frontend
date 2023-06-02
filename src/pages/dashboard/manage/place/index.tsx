@@ -11,29 +11,21 @@ import {
   Tooltip,
   Box,
   Grid,
-  InputAdornment,
   Link,
 } from '@mui/material'
-
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ImageIcon from '@mui/icons-material/Image'
-import {
-  ModalDelete,
-  ModalEdit,
-  ModalImage,
-} from '@/components/Dashboard/manage/place'
-
+import { ModalDelete, ModalEdit } from '@/components/Dashboard/manage/place'
 import { useQuery } from '@tanstack/react-query'
-
-import { TCampus, TPlace, TGetPlaceFilterQueryParams } from '@/types'
+import { TPlace, TGetPlaceFilterQueryParams } from '@/types'
 import { LoadingSpinner } from '@/components'
 import { useForm } from 'react-hook-form'
 import { Form } from '@/components/Form'
-import SearchIcon from '@mui/icons-material/Search'
 import { useDebounce } from '@/hooks'
 import { getCampus, getPlaceFilter } from '@/api'
 import LaunchIcon from '@mui/icons-material/Launch'
+import { ModalImage } from '@/components/Dashboard'
 
 const header = ['Ações', 'Nome', 'Campus', 'Bloco', 'Piso', '']
 
@@ -278,7 +270,7 @@ export default function ManagePlace() {
       <ModalImage
         open={openImage}
         handleClose={() => setOpenImage(false)}
-        data={data}
+        images={data?.image}
       />
     </>
   )

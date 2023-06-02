@@ -14,21 +14,21 @@ import {
   Button,
   Link,
 } from '@mui/material'
-
+import ImageIcon from '@mui/icons-material/Image'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { TEvent, TGetEventFilterQueryParams } from '@/types'
-import { DataRole } from '@/data'
 import { ModalDelete, ModalEdit } from '@/components/Dashboard/manage/event'
 import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useDebounce } from '@/hooks'
 import { Form } from '@/components/Form'
 import { LoadingSpinner } from '@/components'
-import { getEventFilter, getUserFilter } from '@/api'
+import { getEventFilter } from '@/api'
 import AddIcon from '@mui/icons-material/Add'
 import CircleIcon from '@mui/icons-material/Circle'
 import LaunchIcon from '@mui/icons-material/Launch'
+import { ModalImage } from '@/components/Dashboard'
 
 const header = ['Ações', 'Nome', 'Data', 'Lugar', 'Prioridade', '']
 
@@ -36,6 +36,7 @@ export default function ManageEvent() {
   const [openEdit, setOpenEdit] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const [openCreate, setOpenCreate] = useState(false)
+  const [openImage, setOpenImage] = useState(false)
   const [data, setData] = useState<TEvent>()
 
   const [params, setParams] = useState<TGetEventFilterQueryParams>({})
@@ -142,7 +143,7 @@ export default function ManageEvent() {
             )}
             {events?.map((row: TEvent) => (
               <TableRow key={row.id} sx={styles.tableRow}>
-                <TableCell>
+                <TableCell sx={{ minWidth: 130 }}>
                   <Tooltip title="Editar">
                     <EditIcon
                       onClick={() => {
@@ -159,8 +160,18 @@ export default function ManageEvent() {
                         setData(row)
                         setOpenDelete(true)
                       }}
-                      sx={{ cursor: 'pointer', ml: 1 }}
+                      sx={{ cursor: 'pointer', mr: 1 }}
                       color="error"
+                    />
+                  </Tooltip>
+                  <Tooltip title="Ver Imagem">
+                    <ImageIcon
+                      onClick={() => {
+                        setData(row)
+                        setOpenImage(true)
+                      }}
+                      sx={{ cursor: 'pointer', mr: 1 }}
+                      color="primary"
                     />
                   </Tooltip>
                 </TableCell>
@@ -218,6 +229,12 @@ export default function ManageEvent() {
         open={openEdit}
         handleClose={() => setOpenEdit(false)}
         data={data}
+      />
+
+      <ModalImage
+        open={openImage}
+        handleClose={() => setOpenImage(false)}
+        images={data?.image}
       />
     </>
   )

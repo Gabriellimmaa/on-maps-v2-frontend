@@ -90,7 +90,7 @@ export default function Home() {
                 xs: 4,
               }}
               values={
-                !watchUniversity
+                !'  '
                   ? []
                   : watchUniversity.campuses.map((row: any) => ({
                       value: row.id.toString(),

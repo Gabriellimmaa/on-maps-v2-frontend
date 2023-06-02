@@ -1,3 +1,4 @@
+export { ModalImage } from './ModalImage.component'
 export { ModalCreateCampus } from './ModalCreateCampus.component'
 export { ModalDelete } from './ModalDelete.component'
 export { ModalCreateUniversity } from './ModalCreateUniversity.component'

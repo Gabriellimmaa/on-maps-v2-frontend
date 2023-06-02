@@ -18,7 +18,7 @@ export type TEvent = {
     name: string
   }
   place?: TPlace
-  PlaceId?: number
+  placeId?: number
   createdAt: string
   updatedAt: string
 }

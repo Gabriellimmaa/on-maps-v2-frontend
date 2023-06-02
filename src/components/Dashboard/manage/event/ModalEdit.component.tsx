@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Box,
   Grid,
+  InputAdornment,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -15,16 +16,27 @@ import {
   TEvent,
   TGetPlaceFilterQueryParams,
   TPostCreateEventBody,
+  TPostImage,
+  TUniversity,
 } from '@/types'
 import { queryClient } from '@/clients'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { getPlaceFilter, putEvent, putUser } from '@/api'
+import {
+  getPlaceFilter,
+  getUniversityFilter,
+  postDiscordWebhook,
+  putEvent,
+  putUser,
+} from '@/api'
 import { useToast } from '@/hooks/useToast.hook'
-import { removeMatchingAttributes } from '@/utils/helpers'
+import { onlyNumbers, removeMatchingAttributes } from '@/utils/helpers'
 import AddIcon from '@mui/icons-material/Add'
 import ImageIcon from '@mui/icons-material/Image'
 import SearchIcon from '@mui/icons-material/Search'
 import dynamic from 'next/dynamic'
+import { cellPhoneInputMask } from '@/utils/inputMasks'
+import { useDebounce } from '@/hooks'
+import { LoadingSpinner } from '@/components/Loading'
 
 const MapComponent = dynamic(() => import('@/components/Map/Map.component'), {
   loading: () => <p>loading...</p>,
@@ -37,6 +49,30 @@ type TProps = {
   data: TEvent | undefined
 }
 
+type TFormProps = {
+  name: string
+  date: string
+  organizer: string
+  description: string
+  emphasis: boolean
+  file1: any
+  file2: any
+  file3: any
+  optionPlace: boolean
+  findPlace: string
+  phone: string
+  instagram: string
+  website: string
+  placeId?: number
+  position?: {
+    latitude: number
+    longitude: number
+    name: string
+  }
+  university?: TUniversity
+  campusId?: number
+}
+
 export const ModalEdit = (props: TProps) => {
   const { open, handleClose, data } = props
   const { createToast } = useToast()
@@ -46,7 +82,7 @@ export const ModalEdit = (props: TProps) => {
   const latitude = -23.5505199
   const longitude = -46.6333094
 
-  const formHandler = useForm({
+  const formHandler = useForm<TFormProps>({
     mode: 'all',
   })
 
@@ -54,22 +90,33 @@ export const ModalEdit = (props: TProps) => {
   const watchFile1 = formHandler.watch('file1')
   const watchFile2 = formHandler.watch('file2')
   const watchFile3 = formHandler.watch('file3')
+  const watchFindPlace = formHandler.watch('findPlace')
+  const debouncedSearch = useDebounce(watchFindPlace, 500)
+  const watchUniversity = formHandler.watch('university')
+  const watchCampusId = formHandler.watch('campusId')
 
-  // useEffect(() => {
-  //   formHandler.reset({
-  //     username: data?.username,
-  //     email: data?.email,
-  //     MANAGE_PLACE: data?.permissions.includes('MANAGE_PLACE'),
-  //     MANAGE_USER: data?.permissions.includes('MANAGE_USER'),
-  //   })
-  // }, [data, formHandler])
+  useEffect(() => {
+    formHandler.reset({
+      ...data,
+      optionPlace: data?.placeId ? true : false,
+    })
+  }, [data, formHandler])
 
-  const { data: places, isLoading: isLoadingPlaces } = useQuery(
-    ['places', params],
-    () => getPlaceFilter(params),
-    {
-      enabled: !!watchOptionPlace,
-    }
+  const {
+    data: places,
+    isFetching: isLoadingPlaces,
+    refetch,
+  } = useQuery(['places', params], () => getPlaceFilter(params), {
+    enabled: !!debouncedSearch,
+  })
+
+  const { data: universities } = useQuery(['universities'], () =>
+    getUniversityFilter()
+  )
+
+  const { mutateAsync: mutateDiscordImage } = useMutation(
+    postDiscordWebhook,
+    {}
   )
 
   const { mutateAsync, isLoading } = useMutation(
@@ -78,7 +125,7 @@ export const ModalEdit = (props: TProps) => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries(['users'])
-        createToast('Usuário editado com sucesso!', 'success')
+        createToast('Evento editado com sucesso!', 'success')
         handleClose()
       },
       onError: (error: any) => {
@@ -87,6 +134,18 @@ export const ModalEdit = (props: TProps) => {
       },
     }
   )
+
+  useEffect(() => {
+    setParams({
+      placeName: debouncedSearch,
+      campusId: watchCampusId,
+    })
+  }, [debouncedSearch])
+
+  useEffect(() => {
+    formHandler.setValue('position.latitude', markers?.latitude)
+    formHandler.setValue('position.longitude', markers?.longitude)
+  }, [formHandler, markers])
 
   if (!data) return null
 
@@ -103,23 +162,78 @@ export const ModalEdit = (props: TProps) => {
           handler={formHandler}
           onSubmit={async (dataForm) => {
             try {
+              const files = []
+              if (dataForm.file1) files.push(dataForm.file1)
+              if (dataForm.file2) files.push(dataForm.file2)
+              if (dataForm.file3) files.push(dataForm.file3)
+
               const dataToSubmit: Partial<TPostCreateEventBody> = {
-                name: dataForm.username,
+                name: dataForm.name,
+                organizer: dataForm.organizer,
+                description: dataForm.description,
+                date: dataForm.date,
+                emphasis: dataForm.emphasis,
+                phone: dataForm.phone ? onlyNumbers(dataForm.phone) : undefined,
+                instagram: dataForm.instagram ? dataForm.instagram : undefined,
+                website: dataForm.website ? dataForm.website : undefined,
+              }
+
+              if (files.length > 0) {
+                const formData = new FormData()
+                files.forEach((file, index) => {
+                  formData.append(`file${index + 1}`, file)
+                })
+                const responseDiscord = await mutateDiscordImage(formData)
+
+                const images = responseDiscord.attachments.map((attachment) => {
+                  const data: TPostImage = {
+                    url: attachment.url,
+                    name: attachment.filename,
+                    size: attachment.size,
+                    type: attachment.content_type,
+                  }
+                  return data
+                })
+
+                dataToSubmit.image = images
               }
 
               removeMatchingAttributes(dataToSubmit, data)
 
+              if (dataForm.placeId) {
+                dataToSubmit.placeId = dataForm.placeId
+              }
+
+              if (dataForm.position.name !== data?.position?.name) {
+                dataToSubmit.position = {
+                  name: dataForm.position.name,
+                  latitude: dataForm.position.latitude,
+                  longitude: dataForm.position.longitude,
+                }
+              }
+              if (dataForm.optionPlace) {
+                delete dataToSubmit.position
+              } else {
+                delete dataToSubmit.placeId
+              }
               await mutateAsync({ id: data.id, body: dataToSubmit })
+              queryClient.invalidateQueries(['events'])
               handleClose()
             } catch {}
           }}
         >
           <Form.TextInput id="name" label="Nome" />
-          <Form.TextInput id="description" label="Descrição" />
           <Form.TextInput id="organizer" label="Organizador" />
-          <Form.DatePickerInput
+          <Form.TextEditorInput
+            id="description"
+            label="Descrição do evento"
+            gridProps={{
+              xs: 12,
+            }}
+          />
+          <Form.DateTimeInput
             id="date"
-            label="Data"
+            label="Data e hora do evento"
             gridProps={{
               xs: 6,
             }}
@@ -133,6 +247,40 @@ export const ModalEdit = (props: TProps) => {
             }}
             gridProps={{
               xs: 6,
+            }}
+          />
+
+          <Form.MaskedTextInput
+            id="phone"
+            label="Celular"
+            mask={cellPhoneInputMask}
+            gridProps={{
+              xs: 4,
+            }}
+          />
+          <Form.TextInput
+            id="instagram"
+            label="Instagram"
+            gridProps={{
+              xs: 4,
+            }}
+            textFieldProps={{
+              InputProps: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Typography variant="body2" fontSize={15}>
+                      @
+                    </Typography>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <Form.TextInput
+            id="website"
+            label="Website"
+            gridProps={{
+              xs: 4,
             }}
           />
 
@@ -199,11 +347,52 @@ export const ModalEdit = (props: TProps) => {
               xs: 12,
             }}
           />
+          {data?.place?.name && (
+            <Typography variant="h5" mb={2}>
+              Esse evento está vinculado ao local: {data?.place?.name}
+            </Typography>
+          )}
 
           {watchOptionPlace ? (
             <>
+              <Form.SelectInput
+                id="university"
+                label={'Universidade'}
+                values={
+                  universities
+                    ? universities?.map((row) => ({
+                        label: row.name,
+                        value: row,
+                      }))
+                    : []
+                }
+                gridProps={{
+                  xs: 12,
+                }}
+                selectProps={{
+                  value: watchUniversity ? watchUniversity : '',
+                }}
+              />
+              <Form.SelectInput
+                id="campusId"
+                label={'Campus'}
+                values={
+                  watchUniversity
+                    ? watchUniversity.campuses.map((row) => ({
+                        label: row.name,
+                        value: row.id,
+                      }))
+                    : []
+                }
+                gridProps={{
+                  xs: 12,
+                }}
+                selectProps={{
+                  disabled: !watchUniversity,
+                }}
+              />
               <Form.TextInput
-                id="place"
+                id="findPlace"
                 label="Pesquisar local"
                 textFieldProps={{
                   InputProps: {
@@ -213,6 +402,7 @@ export const ModalEdit = (props: TProps) => {
                 gridProps={{
                   xs: 6,
                 }}
+                disabled={!!!watchCampusId}
               />
               <Form.SelectInput
                 id="placeId"
@@ -229,6 +419,19 @@ export const ModalEdit = (props: TProps) => {
                   xs: 6,
                 }}
               />
+              {isLoadingPlaces && (
+                <>
+                  <LoadingSpinner />
+                  <Typography variant="body2" fontSize={15} ml={2}>
+                    Buscando dados...
+                  </Typography>
+                </>
+              )}
+              {places?.length === 0 && (
+                <Typography variant="body2" fontSize={15} ml={2} mb={2}>
+                  Nenhum local encontrado
+                </Typography>
+              )}
             </>
           ) : (
             <>
@@ -263,10 +466,6 @@ export const ModalEdit = (props: TProps) => {
               sx: {
                 width: 1,
               },
-              startIcon: isLoading ? (
-                <CircularProgress sx={{ color: 'white' }} size={20} />
-              ) : null,
-              disabled: isLoading,
             }}
             handler={formHandler}
           >

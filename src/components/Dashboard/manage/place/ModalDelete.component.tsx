@@ -1,6 +1,6 @@
 import { DialogHeader } from '@/components/Dialog'
 import { Button, Dialog, Typography, DialogContent, Box } from '@mui/material'
-import ImageSwiper from './ImageSwiper.component'
+import ImageSwiper from '../../ImageSwiper.component'
 import { TPlace } from '@/types'
 import { queryClient } from '@/clients'
 import { useMutation } from '@tanstack/react-query'
