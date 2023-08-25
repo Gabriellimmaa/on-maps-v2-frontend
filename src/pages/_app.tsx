@@ -41,6 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [])
 
   if (noThemeMui.includes(checkComponentName)) {
+    console.log('noThemeMui' + checkComponentName)
     return defaultProvider({
       children: <Component {...pageProps} />,
       layout: React.Fragment,
@@ -51,6 +52,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }
 
   if (noLayoutComponent.includes(checkComponentName)) {
+    console.log('noLayoutComponent' + checkComponentName)
     return defaultProvider({
       children: <Component {...pageProps} />,
       layout: React.Fragment,
@@ -59,7 +61,7 @@ export default function App({ Component, pageProps }: AppProps) {
       setOpenFeedback,
     })
   }
-
+  console.log('com layout' + checkComponentName)
   return defaultProvider({
     children: <Component {...pageProps} />,
     layout: DefaultLayout,
