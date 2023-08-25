@@ -14,13 +14,16 @@ import { UserProvider } from '@/context/user.context'
 import { ModalFeedback } from '@/components/Feedback'
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter()
   const [openFeedback, setOpenFeedback] = useState<boolean>(false)
-  const noThemeMui = ['']
-  const noLayoutComponent = ['Home', 'Login', 'Custom404', 'Map']
+  const { pathname } = router
 
-  const checkComponentName = Component.displayName
-    ? Component.displayName
-    : Component.name
+  const noLayoutComponent = ['/login', '/404', '/map']
+  const indexPage = pathname === '/' || pathname === '/index'
+
+  const shouldRenderLayout = !noLayoutComponent.some((path) =>
+    pathname.includes(path)
+  )
 
   useEffect(() => {
     const checkUserFeedback = localStorage.getItem('userFeedback')
@@ -40,31 +43,9 @@ export default function App({ Component, pageProps }: AppProps) {
     return () => clearTimeout(timeoutId)
   }, [])
 
-  if (noThemeMui.includes(checkComponentName)) {
-    console.log('noThemeMui' + checkComponentName)
-    return defaultProvider({
-      children: <Component {...pageProps} />,
-      layout: React.Fragment,
-      theme: false,
-      openFeedback,
-      setOpenFeedback,
-    })
-  }
-
-  if (noLayoutComponent.includes(checkComponentName)) {
-    console.log('noLayoutComponent' + checkComponentName)
-    return defaultProvider({
-      children: <Component {...pageProps} />,
-      layout: React.Fragment,
-      theme: true,
-      openFeedback,
-      setOpenFeedback,
-    })
-  }
-  console.log('com layout' + checkComponentName)
   return defaultProvider({
     children: <Component {...pageProps} />,
-    layout: DefaultLayout,
+    layout: shouldRenderLayout && !indexPage ? DefaultLayout : React.Fragment,
     theme: true,
     openFeedback,
     setOpenFeedback,

@@ -35,7 +35,7 @@ import { useRouter } from 'next/router'
 const headerUniversity = ['Ações', 'Nome', 'Sigla', 'Campus']
 const headerCampus = ['Ações', 'Nome', 'Cidade', 'Universidade', 'Ambientes']
 
-function Dashboard() {
+export default function Dashboard() {
   const router = useRouter()
   const [type, setType] = useState<'university' | 'campus' | null>(null)
   const [data, setData] = useState<any>(null)
@@ -372,10 +372,4 @@ const styles = {
   },
 }
 
-export async function getServerSideProps() {
-  return {
-    props: {},
-  }
-}
-
-export default Dashboard
+Dashboard.displayName = 'Dashboard'
