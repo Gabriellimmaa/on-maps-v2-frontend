@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './styles/MapSideBar.module.css'
 import { FaUser } from 'react-icons/fa'
 import { DataMapCategories, DataCampus, DataEvents } from '@/data'
@@ -83,15 +83,11 @@ export function MapSideBar() {
     () => getCategory(),
     {
       keepPreviousData: true,
-      onSuccess: (data) => {
-        return [
-          {
-            id: 0,
-            name: 'Todos',
-            description: 'Todos os eventos',
-          },
-          ...data,
-        ]
+      onSuccess(data) {
+        data.unshift({
+          id: 0,
+          name: 'todas',
+        })
       },
     }
   )
@@ -122,7 +118,7 @@ export function MapSideBar() {
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
-    setConfig(value)
+    value === 'todas' ? setConfig(undefined) : setConfig(value)
   }
 
   function handleRange(value: number) {
@@ -353,7 +349,7 @@ export function MapSideBar() {
               min={1}
               max={8}
               step={1}
-              defaultValue={1}
+              defaultValue={8}
               onChange={(e, newValue) => {
                 handleRange(newValue as number)
               }}
@@ -379,7 +375,10 @@ export function MapSideBar() {
                           py: 0.5,
                         }}
                         onChange={handleRadioChange}
-                        checked={category.name === config}
+                        checked={
+                          category.name === config ||
+                          (category.id === 0 && !config)
+                        }
                       />
                     }
                     label={

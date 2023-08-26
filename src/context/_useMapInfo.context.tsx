@@ -5,7 +5,7 @@ type MapInfoContextType = {
   viewMenu: boolean
   setViewMenu: (value: boolean) => void
   config: string
-  setConfig: (value: string) => void
+  setConfig: (value: string | undefined) => void
   position: {
     latitude: number
     longitude: number

@@ -67,21 +67,6 @@ export default function EventList() {
 
   if (isLoadingEventsEmphasis) return <LoadingSpinner />
 
-  if (events?.length === 0)
-    return (
-      <Box textAlign="center">
-        <Typography variant="h3" fontWeight={'bold'}>
-          Ops!
-        </Typography>
-        <Typography variant="h4">
-          Parece que não encontramos nenhum evento na plataforma no momento.
-        </Typography>
-        <Typography variant="h4">
-          Que tal explorar outras opções disponíveis? 😊
-        </Typography>
-      </Box>
-    )
-
   return (
     <Box sx={styles.mainContainer}>
       {eventsEmphasis && eventsEmphasis?.length > 0 && (
@@ -178,6 +163,20 @@ export default function EventList() {
           }}
         />
       </Form>
+
+      {events?.length === 0 && (
+        <Box textAlign="center" mt={4}>
+          <Typography variant="h3" fontWeight={'bold'}>
+            Ops!
+          </Typography>
+          <Typography variant="h4">
+            Parece que não encontramos nenhum evento na plataforma no momento.
+          </Typography>
+          <Typography variant="h4">
+            Que tal explorar outras opções disponíveis? 😊
+          </Typography>
+        </Box>
+      )}
 
       {isLoadingEvents ? (
         <LoadingSpinner />

@@ -216,7 +216,7 @@ export default function PlaceList() {
                     disabled: !watchCampus,
                   }}
                 />
-
+                {/*
                 <Form.SelectCheckboxInput
                   id="equipments"
                   label="Equipamentos"
@@ -234,7 +234,7 @@ export default function PlaceList() {
                   selectProps={{
                     disabled: !watchCampus,
                   }}
-                />
+                /> */}
               </>
             )}
           </Grid>
